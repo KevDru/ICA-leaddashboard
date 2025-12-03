@@ -3,55 +3,45 @@ require "db.php";
 
 $method = $_SERVER["REQUEST_METHOD"];
 
-// GET /columns
 if ($method === "GET") {
     $stmt = $pdo->query("SELECT * FROM columns ORDER BY position ASC");
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
     exit;
 }
 
-// POST /columns
 if ($method === "POST") {
     $data = json_decode(file_get_contents("php://input"), true);
-    $name = $data["name"] ?? null;
 
-    if (!$name) {
-        echo json_encode(["error" => "Column name required"]);
-        exit;
-    }
-
-    $stmt = $pdo->prepare("INSERT INTO columns (name, position) VALUES (?, (SELECT COALESCE(MAX(position),0)+1 FROM columns))");
-    $stmt->execute([$name]);
+    $stmt = $pdo->prepare("
+        INSERT INTO columns (name, position)
+        VALUES (?, (SELECT COALESCE(MAX(position),0)+1 FROM columns))
+    ");
+    $stmt->execute([$data["name"]]);
 
     echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
     exit;
 }
 
-// PUT /columns?id=1
 if ($method === "PUT") {
-    $id = $_GET["id"] ?? null;
+    $id = $_GET["id"];
+
     $data = json_decode(file_get_contents("php://input"), true);
 
-    if (!$id) { echo json_encode(["error" => "ID required"]); exit; }
-
-    $stmt = $pdo->prepare("UPDATE columns SET name = ? WHERE id = ?");
-    $stmt->execute([$data["name"], $id]);
+    $stmt = $pdo->prepare("UPDATE columns SET name = ?, position = ? WHERE id = ?");
+    $stmt->execute([$data["name"], $data["position"], $id]);
 
     echo json_encode(["success" => true]);
     exit;
 }
 
-// DELETE /columns?id=1
 if ($method === "DELETE") {
-    $id = $_GET["id"] ?? null;
+    $id = $_GET["id"];
 
-    if (!$id) { echo json_encode(["error" => "ID required"]); exit; }
+    // check empty column
+    $count = $pdo->prepare("SELECT COUNT(*) FROM leads WHERE column_id = ?");
+    $count->execute([$id]);
 
-    // Prevent deleting if column contains leads
-    $check = $pdo->prepare("SELECT COUNT(*) FROM leads WHERE column_id = ?");
-    $check->execute([$id]);
-
-    if ($check->fetchColumn() > 0) {
+    if ($count->fetchColumn() > 0) {
         echo json_encode(["error" => "Column not empty"]);
         exit;
     }
@@ -60,5 +50,4 @@ if ($method === "DELETE") {
     $stmt->execute([$id]);
 
     echo json_encode(["success" => true]);
-    exit;
 }

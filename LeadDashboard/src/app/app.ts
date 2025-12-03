@@ -1,13 +1,15 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { Statistics } from "./statistics/statistics";
+import { KanbanBoardComponent } from './components/kanban-board/kanban-board';
+// import other components here if needed
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Statistics],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+  standalone: true,
+  imports: [KanbanBoardComponent],
+  template: `
+      <app-kanban-board></app-kanban-board>
+  `,
 })
-export class App {
-  protected readonly title = signal('LeadDashboard');
+export class AppComponent {
+  isLoggedIn = signal(true);
 }

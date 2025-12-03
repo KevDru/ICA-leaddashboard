@@ -1,0 +1,14 @@
+<div class="kanban-board">
+  <div class="columns">
+    @for (column of columns(); track column.id) {
+      <app-kanban-column
+        [column]="column"
+        [leads]="leadsMap().get(column.id) || []"
+        (dropEvent)="drop($event, column.id)">
+      </app-kanban-column>
+    }
+    @empty {
+      <p>No columns found</p>
+    }
+  </div>
+</div>

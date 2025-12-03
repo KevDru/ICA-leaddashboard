@@ -1,0 +1,12 @@
+.kanban-board {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 1rem;
+  height: 100%;
+
+  .columns {
+    display: flex;
+    gap: 1rem;
+  }
+}

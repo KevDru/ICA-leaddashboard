@@ -1,0 +1,14 @@
+<div class="kanban-column">
+  <h3>{{ column.name }}</h3>
+  <div
+    cdkDropList
+    [cdkDropListData]="leads"
+    class="leads-container"
+    (cdkDropListDropped)="dropEvent.emit($event)">
+    <app-lead-card
+      *ngFor="let lead of leads"
+      [lead]="lead"
+      cdkDrag>
+    </app-lead-card>
+  </div>
+</div>

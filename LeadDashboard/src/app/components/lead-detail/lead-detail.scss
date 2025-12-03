@@ -1,0 +1,11 @@
+.lead-detail {
+  max-width: 600px;
+  margin: auto;
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    input, textarea { padding: 0.5rem; border-radius: 0.25rem; border: 1px solid #ccc; }
+    button { padding: 0.5rem; border: none; background: #3b82f6; color: white; border-radius: 0.25rem; cursor: pointer; }
+  }
+}

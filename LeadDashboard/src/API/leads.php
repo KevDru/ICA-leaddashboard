@@ -3,67 +3,68 @@ require "db.php";
 
 $method = $_SERVER["REQUEST_METHOD"];
 
-// GET /leads?column_id=1
 if ($method === "GET") {
-    $columnId = $_GET["column_id"] ?? null;
-
-    if (!$columnId) {
-        echo json_encode(["error" => "column_id required"]);
+    if (!isset($_GET["column_id"])) {
+        echo json_encode(["error"=>"column_id required"]);
         exit;
     }
 
     $stmt = $pdo->prepare("SELECT * FROM leads WHERE column_id = ? ORDER BY id DESC");
-    $stmt->execute([$columnId]);
+    $stmt->execute([$_GET["column_id"]]);
 
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
     exit;
 }
 
-// POST /leads
 if ($method === "POST") {
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $title = $data["title"] ?? null;
-    $customer = $data["customer"] ?? null;
-    $columnId = $data["column_id"] ?? null;
+    $stmt = $pdo->prepare("
+        INSERT INTO leads (title, customer, description, column_id)
+        VALUES (?, ?, ?, ?)
+    ");
+    $stmt->execute([
+        $data["title"],
+        $data["customer"],
+        $data["description"] ?? null,
+        $data["column_id"]
+    ]);
 
-    if (!$title || !$customer || !$columnId) {
-        echo json_encode(["error" => "Missing required fields"]);
+    $id = $pdo->lastInsertId();
+
+    // history
+    $pdo->prepare("INSERT INTO lead_history (lead_id, action) VALUES (?, 'Lead created')")
+        ->execute([$id]);
+
+    echo json_encode(["success" => true, "id" => $id]);
+    exit;
+}
+
+if ($method === "PUT") {
+    if (strpos($_SERVER['REQUEST_URI'], "move") !== false) {
+        $id = $_GET["id"];
+
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        $stmt = $pdo->prepare("UPDATE leads SET column_id = ? WHERE id = ?");
+        $stmt->execute([$data["column_id"], $id]);
+
+        $pdo->prepare("INSERT INTO lead_history (lead_id, action) VALUES (?, 'Moved column')")
+            ->execute([$id]);
+
+        echo json_encode(["success" => true]);
         exit;
     }
 
-    $stmt = $pdo->prepare("INSERT INTO leads (title, customer, column_id) VALUES (?, ?, ?)");
-    $stmt->execute([$title, $customer, $columnId]);
-
-    echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
-    exit;
-}
-
-// PUT /leads/move?id=10
-if ($method === "PUT" && strpos($_SERVER["REQUEST_URI"], "move") !== false) {
-    $id = $_GET["id"] ?? null;
-
-    if (!$id) { echo json_encode(["error" => "ID required"]); exit; }
+    $id = $_GET["id"];
 
     $data = json_decode(file_get_contents("php://input"), true);
-    $columnId = $data["column_id"] ?? null;
 
-    $stmt = $pdo->prepare("UPDATE leads SET column_id = ? WHERE id = ?");
-    $stmt->execute([$columnId, $id]);
+    $stmt = $pdo->prepare("UPDATE leads SET title=?, customer=?, description=? WHERE id=?");
+    $stmt->execute([$data["title"], $data["customer"], $data["description"], $id]);
 
-    echo json_encode(["success" => true]);
-    exit;
-}
-
-// DELETE /leads?id=10
-if ($method === "DELETE") {
-    $id = $_GET["id"] ?? null;
-
-    if (!$id) { echo json_encode(["error" => "ID required"]); exit; }
-
-    $stmt = $pdo->prepare("DELETE FROM leads WHERE id = ?");
-    $stmt->execute([$id]);
+    $pdo->prepare("INSERT INTO lead_history (lead_id, action) VALUES (?, 'Lead updated')")
+        ->execute([$id]);
 
     echo json_encode(["success" => true]);
-    exit;
 }
