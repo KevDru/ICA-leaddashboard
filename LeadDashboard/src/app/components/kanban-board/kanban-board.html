@@ -11,4 +11,9 @@
       <p>No columns found</p>
     }
   </div>
+
+  <div class="new-column">
+    <input type="text" [value]="newColumnName()" (input)="newColumnName.set($any($event.target).value)" placeholder="New column name" />
+    <button (click)="createColumn()">Add Column</button>
+  </div>
 </div>

@@ -10,7 +10,7 @@ $endpoint = $uri[1] ?? null;
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") exit;
 
 switch ($endpoint) {
-    case "columns": require "columns.php"; break;
+    case "lead_columns": require "lead_columns.php"; break;
     case "leads": require "leads.php"; break;
     case "history": require "history.php"; break;
     default: echo json_encode(["error" => "Invalid endpoint"]);

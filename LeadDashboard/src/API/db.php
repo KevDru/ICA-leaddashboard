@@ -1,6 +1,6 @@
 <?php
 $host = "localhost";
-$dbname = "lead_dashboard";
+$dbname = "leads-dashboard";
 $user = "root";
 $pass = "";
 

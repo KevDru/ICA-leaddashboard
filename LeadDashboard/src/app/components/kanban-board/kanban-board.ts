@@ -11,18 +11,20 @@ import {
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { KanbanColumnComponent } from '../kanban-column/kanban-column';
+import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  imports: [CommonModule, KanbanColumnComponent, DragDropModule, HttpClientModule],
+  imports: [CommonModule, KanbanColumnComponent, DragDropModule, FormsModule, ReactiveFormsModule, HttpClientModule],
   templateUrl: './kanban-board.html',
   styleUrls: ['./kanban-board.scss'],
 })
 export class KanbanBoardComponent implements OnInit {
   columns = signal<Column[]>([]);
   leadsMap = signal<Map<number, Lead[]>>(new Map());
+  newColumnName = signal('');
 
   private columnsService = inject(ColumnsService);
   private leadsService = inject(LeadsService);
@@ -60,5 +62,15 @@ export class KanbanBoardComponent implements OnInit {
         );
       });
     }
+  }
+
+  createColumn() {
+    const name = this.newColumnName().trim();
+    if (!name) return;
+
+    this.columnsService.create(name).subscribe((res: any) => {
+      this.newColumnName.set('');
+      this.loadColumns();
+    });
   }
 }
