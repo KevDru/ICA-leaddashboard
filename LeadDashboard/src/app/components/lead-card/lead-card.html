@@ -1,4 +1,11 @@
-<div class="lead-card" (click)="goToDetail()">
+@if (lead) {
+<div cdkDrag class="lead-card">
+
   <h4>{{ lead.title }}</h4>
   <p>{{ lead.customer }}</p>
+  <button type="button" class="edit-btn" (click)="openDetailModal()">Edit</button>
+
+  <button type="button" class="delete-btn" (click)="deleteLead()">Delete</button>
+
 </div>
+}

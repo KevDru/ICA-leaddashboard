@@ -1,21 +1,31 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { LeadDetailComponent } from '../lead-detail/lead-detail';
 import { Lead } from '../../models/lead';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-lead-card',
   standalone: true,
-  imports: [CommonModule, DragDropModule],
+  imports: [],
   templateUrl: './lead-card.html',
   styleUrls: ['./lead-card.scss']
 })
 export class LeadCardComponent {
   @Input() lead!: Lead;
+  @Output() deleteLeadEvent = new EventEmitter<number>();
+
+  private dialog = inject(MatDialog); // ✅ FIX
   private router = inject(Router);
 
-  goToDetail() {
-    this.router.navigate(['/lead', this.lead.id]);
+  openDetailModal() {
+    this.dialog.open(LeadDetailComponent, {
+      width: '600px',
+      data: { id: this.lead.id }
+    });
+  }
+
+  deleteLead() {
+    this.deleteLeadEvent.emit(this.lead.id);
   }
 }

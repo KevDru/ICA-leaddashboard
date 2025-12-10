@@ -1,14 +1,27 @@
 <div class="kanban-column">
-  <h3>{{ column.name }}</h3>
+  <h3>
+    {{ column.name }}
+    <button class="delete-column-btn" (click)="deleteColumn()">X</button>
+  </h3>
+
   <div
     cdkDropList
+    [id]="'col-' + column.id"
+    [cdkDropListConnectedTo]="connectedDropListsIds"
     [cdkDropListData]="leads"
     class="leads-container"
-    (cdkDropListDropped)="dropEvent.emit($event)">
-    <app-lead-card
-      *ngFor="let lead of leads"
-      [lead]="lead"
-      cdkDrag>
-    </app-lead-card>
+    (cdkDropListDropped)="dropEvent.emit($event)"
+  >
+    @for (lead of leads; track lead.id) {
+      <app-lead-card
+        [lead]="lead"
+        (deleteLeadEvent)="deleteLead($event)">
+      </app-lead-card>
+    }
+  </div>
+
+  <div class="new-lead">
+    <input type="text" [(ngModel)]="newLeadTitle" placeholder="New lead" />
+    <button (click)="createLead()">Add Lead</button>
   </div>
 </div>

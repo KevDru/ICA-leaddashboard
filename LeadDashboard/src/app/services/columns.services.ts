@@ -12,3 +12,4 @@ export class ColumnsService {
   update(id: number, data: Partial<Column>) { return this.http.put(`${this.api}?id=${id}`, data); }
   delete(id: number) { return this.http.delete(`${this.api}?id=${id}`); }
 }
+

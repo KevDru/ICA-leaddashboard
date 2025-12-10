@@ -7,17 +7,16 @@ import {
   CdkDragDrop,
   moveItemInArray,
   transferArrayItem,
-  DragDropModule,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { KanbanColumnComponent } from '../kanban-column/kanban-column';
-import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-kanban-board',
   standalone: true,
-  imports: [CommonModule, KanbanColumnComponent, DragDropModule, FormsModule, ReactiveFormsModule, HttpClientModule],
+  imports: [CommonModule, KanbanColumnComponent, FormsModule, HttpClientModule],
   templateUrl: './kanban-board.html',
   styleUrls: ['./kanban-board.scss'],
 })
@@ -68,9 +67,17 @@ export class KanbanBoardComponent implements OnInit {
     const name = this.newColumnName().trim();
     if (!name) return;
 
-    this.columnsService.create(name).subscribe((res: any) => {
+    this.columnsService.create(name).subscribe(() => {
       this.newColumnName.set('');
       this.loadColumns();
+    });
+  }
+
+  deleteColumn(id: number) {
+    if (!confirm('Are you sure you want to delete this column?')) return;
+    this.columnsService.delete(id).subscribe({
+      next: () => this.loadColumns(),
+      error: (err) => alert(err.error?.error || 'Failed to delete column'),
     });
   }
 }

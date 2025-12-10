@@ -4,7 +4,8 @@
       <app-kanban-column
         [column]="column"
         [leads]="leadsMap().get(column.id) || []"
-        (dropEvent)="drop($event, column.id)">
+        (dropEvent)="drop($event, column.id)"
+        (deleteColumnEvent)="deleteColumn($event)">
       </app-kanban-column>
     }
     @empty {
@@ -13,7 +14,7 @@
   </div>
 
   <div class="new-column">
-    <input type="text" [value]="newColumnName()" (input)="newColumnName.set($any($event.target).value)" placeholder="New column name" />
+    <input type="text" [value]="newColumnName()" (input)="newColumnName.set($any($event.target).value)" />
     <button (click)="createColumn()">Add Column</button>
   </div>
 </div>

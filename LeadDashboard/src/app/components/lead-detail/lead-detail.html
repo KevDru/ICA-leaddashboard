@@ -1,17 +1,33 @@
-<div *ngIf="lead()" class="lead-detail">
+@if (lead(); as l) {
+<div class="lead-detail">
+
   <h2>Edit Lead</h2>
+
   <form [formGroup]="form" (ngSubmit)="save()">
     <label>Title</label>
     <input formControlName="title"/>
+
     <label>Customer</label>
     <input formControlName="customer"/>
+
     <label>Description</label>
     <textarea formControlName="description"></textarea>
+
     <button type="submit">Save</button>
+    <button type="button" class="delete-btn" (click)="delete()">Delete Lead</button>
   </form>
 
   <h3>History</h3>
+
   <ul>
-    <li *ngFor="let h of history()">{{ h.action }} at {{ h.created_at }}</li>
+    @for (h of history(); track h.id) {
+      <li>{{ h.action }} at {{ h.created_at }}</li>
+    }
+    @empty {
+      <li>No history available</li>
+    }
   </ul>
+
 </div>
+}
+  
