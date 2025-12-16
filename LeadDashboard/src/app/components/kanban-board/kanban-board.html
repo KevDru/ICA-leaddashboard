@@ -4,7 +4,9 @@
       <app-kanban-column
         [column]="column"
         [leads]="leadsMap().get(column.id) || []"
-        (dropEvent)="drop($event, column.id)">
+        [connectedDropLists]="connectedDropLists()"
+        (dropEvent)="drop($event, column.id)"
+        (reloadEvent)="reloadLeads()">
       </app-kanban-column>
     }
     @empty {

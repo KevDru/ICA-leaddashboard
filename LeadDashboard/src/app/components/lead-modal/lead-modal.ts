@@ -42,8 +42,8 @@ export class LeadModalComponent {
     };
 
     this.leadsService.create(payload).subscribe(() => {
-      this.created.emit();
-      this.dialogRef.close(true);
+      this.created.emit();           // notify parent to refresh
+      this.dialogRef.close(true);    // close modal
     });
   }
 

@@ -4,7 +4,7 @@ import { Lead } from '../models/lead';
 
 @Injectable({ providedIn: 'root' })
 export class LeadsService {
-  private api = 'http://localhost/ICA-leaddashboard/LeadDashboard/src/API/leads.php';
+  private api = 'http://localhost/ICA-leaddashboard/ICA-leaddashboard/LeadDashboard/src/API/leads.php';
   private http = inject(HttpClient);
 
   getByColumn(columnId: number) {

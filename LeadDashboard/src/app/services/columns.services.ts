@@ -4,7 +4,7 @@ import { Column } from '../models/column';
 
 @Injectable({ providedIn: 'root' })
 export class ColumnsService {
-  private api = 'http://localhost/ICA-leaddashboard/LeadDashboard/src/API/lead_columns.php';
+  private api = 'http://localhost/ICA-leaddashboard/ICA-leaddashboard/LeadDashboard/src/API/lead_columns.php';
   private http = inject(HttpClient);
 
   getAll() { return this.http.get<Column[]>(this.api); }

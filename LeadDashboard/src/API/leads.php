@@ -16,15 +16,23 @@ require "db.php";
 $method = $_SERVER["REQUEST_METHOD"];
 
 if ($method === "GET") {
-    if (!isset($_GET["column_id"])) {
-        echo json_encode(["error"=>"column_id required"]);
+    // Get single lead by ID
+    if (isset($_GET["id"])) {
+        $stmt = $pdo->prepare("SELECT * FROM leads WHERE id = ?");
+        $stmt->execute([$_GET["id"]]);
+        echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
         exit;
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM leads WHERE column_id = ? ORDER BY id DESC");
-    $stmt->execute([$_GET["column_id"]]);
+    // Get all leads in a column
+    if (isset($_GET["column_id"])) {
+        $stmt = $pdo->prepare("SELECT * FROM leads WHERE column_id = ? ORDER BY id DESC");
+        $stmt->execute([$_GET["column_id"]]);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        exit;
+    }
 
-    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+    echo json_encode(["error"=>"id or column_id required"]);
     exit;
 }
 
@@ -79,4 +87,14 @@ if ($method === "PUT") {
         ->execute([$id]);
 
     echo json_encode(["success" => true]);
+}
+
+if ($method === "DELETE") {
+    $id = $_GET["id"];
+
+    $stmt = $pdo->prepare("DELETE FROM leads WHERE id = ?");
+    $stmt->execute([$id]);
+
+    echo json_encode(["success" => true]);
+    exit;
 }

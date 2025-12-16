@@ -24,6 +24,7 @@ import { HttpClientModule } from '@angular/common/http';
 export class KanbanBoardComponent implements OnInit {
   columns = signal<Column[]>([]);
   leadsMap = signal<Map<number, Lead[]>>(new Map());
+  connectedDropLists = signal<string[]>([]);
   newColumnName = signal('');
 
   private columnsService = inject(ColumnsService);
@@ -36,6 +37,8 @@ export class KanbanBoardComponent implements OnInit {
   loadColumns() {
     this.columnsService.getAll().subscribe((cols: Column[]) => {
       this.columns.set(cols);
+      // build drop-list ids so lists can be connected for cross-column dragging
+      this.connectedDropLists.set(cols.map(col => `drop-list-${col.id}`));
       cols.forEach((col: Column) => this.loadLeads(col.id));
     });
   }
@@ -49,19 +52,25 @@ export class KanbanBoardComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<Lead[]>, columnId: number) {
+    const lead = event.item.data as Lead;
+    
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      const lead = event.previousContainer.data[event.previousIndex];
-      this.leadsService.move(lead.id, columnId).subscribe(() => {
-        transferArrayItem(
-          event.previousContainer.data,
-          event.container.data,
-          event.previousIndex,
-          event.currentIndex
-        );
+      // persist move on backend, then reload authoritative lists
+      this.leadsService.move(lead.id, columnId).subscribe({
+        next: () => this.reloadLeads(),
+        error: () => {
+          // if move fails, revert the visual ordering
+          moveItemInArray(event.previousContainer.data, event.currentIndex, event.previousIndex);
+          alert('Failed to move lead');
+        }
       });
     }
+  }
+
+  reloadLeads() {
+    this.columns().forEach(col => this.loadLeads(col.id));
   }
 
   createColumn() {
@@ -73,4 +82,4 @@ export class KanbanBoardComponent implements OnInit {
       this.loadColumns();
     });
   }
-}
+} 

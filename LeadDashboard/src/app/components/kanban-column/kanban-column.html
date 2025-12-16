@@ -1,14 +1,28 @@
 <div class="kanban-column">
-  <h3>{{ column.name }}</h3>
+  <div class="column-header">
+    <h3>{{ column.name }}</h3>
+    <button (click)="openCreateLeadModal()" class="add-lead-btn">+ Add Lead</button>
+    <button (click)="deleteColumn()" class="delete-column-btn" title="Delete column">×</button>
+  </div>
+
   <div
     cdkDropList
-    [cdkDropListData]="leads"
+    [cdkDropListData]="leadsSignal()"
+    [cdkDropListConnectedTo]="connectedDropLists"
+    [id]="'drop-list-' + column.id"
+    cdkDropListSortingDisabled
     class="leads-container"
     (cdkDropListDropped)="dropEvent.emit($event)">
-    <app-lead-card
-      *ngFor="let lead of leads"
-      [lead]="lead"
-      cdkDrag>
-    </app-lead-card>
+
+    @for (lead of leadsSignal(); track lead.id) {
+      <app-lead-card
+        [lead]="lead"
+        (refreshLeadEvent)="onRefreshLeads()"
+        (deleteLeadEvent)="onRefreshLeads()"
+        cdkDrag>
+      </app-lead-card>
+    }
+
+  
   </div>
 </div>
