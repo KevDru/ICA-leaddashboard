@@ -17,10 +17,14 @@
     button {
       padding: 0.5rem;
       border: none;
-      background: #3b82f6;
+      background: #393c42;
       color: white;
       border-radius: 0.25rem;
       cursor: pointer;
+      &:hover {
+        opacity: 0.85;
+      }
     }
+
   }
 }

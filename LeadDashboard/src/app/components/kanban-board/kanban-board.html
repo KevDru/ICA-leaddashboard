@@ -1,22 +1,22 @@
 <div class="kanban-board">
-    <div class="new-column">
-    <input type="text" [value]="newColumnName()" (input)="newColumnName.set($any($event.target).value)" placeholder="New column name" />
-    <button (click)="createColumn()">Add Column</button>
-  </div>
-  <div class="columns">
-    @for (column of columns(); track column.id) {
-      <app-kanban-column
-        [column]="column"
-        [leads]="leadsMap().get(column.id) || []"
-        [connectedDropLists]="connectedDropLists()"
-        (dropEvent)="drop($event, column.id)"
-        (reloadEvent)="loadColumns()">
-      </app-kanban-column>
-    }
-    @empty {
-      <p>No columns found</p>
-    }
-  </div>
+  <div class="columns-wrapper">
+    <div class="columns">
+      @for (column of columns(); track column.id) {
+        <app-kanban-column
+          [column]="column"
+          [leads]="leadsMap().get(column.id) || []"
+          [connectedDropLists]="connectedDropLists()"
+          (dropEvent)="drop($event, column.id)"
+          (reloadEvent)="loadColumns()">
+        </app-kanban-column>
+      }
+      @empty {
+        <p>No columns found</p>
+      }
+    </div>
 
-
+    <button class="add-column-btn" (click)="promptCreateColumn()" title="Add new column">
+      +
+    </button>
+  </div>
 </div>

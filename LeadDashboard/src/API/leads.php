@@ -69,8 +69,14 @@ if ($method === "PUT") {
         $stmt = $pdo->prepare("UPDATE leads SET column_id = ? WHERE id = ?");
         $stmt->execute([$data["column_id"], $id]);
 
-        $pdo->prepare("INSERT INTO lead_history (lead_id, action) VALUES (?, 'Moved column')")
-            ->execute([$id]);
+        // Get the column name for history
+        $colStmt = $pdo->prepare("SELECT name FROM lead_columns WHERE id = ?");
+        $colStmt->execute([$data["column_id"]]);
+        $column = $colStmt->fetch(PDO::FETCH_ASSOC);
+        $columnName = $column ? $column['name'] : 'Unknown';
+
+        $pdo->prepare("INSERT INTO lead_history (lead_id, action) VALUES (?, ?)")
+            ->execute([$id, 'Moved to column "' . $columnName . '"']);
 
         echo json_encode(["success" => true]);
         exit;
@@ -79,6 +85,13 @@ if ($method === "PUT") {
     $id = $_GET["id"];
 
     $data = json_decode(file_get_contents("php://input"), true);
+
+    // Validate title is not empty
+    if (!isset($data["title"]) || empty(trim($data["title"]))) {
+        http_response_code(400);
+        echo json_encode(["error" => "Title is required"]);
+        exit;
+    }
 
     $stmt = $pdo->prepare("UPDATE leads SET title=?, customer=?, description=? WHERE id=?");
     $stmt->execute([$data["title"], $data["customer"], $data["description"], $id]);

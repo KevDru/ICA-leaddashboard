@@ -1,0 +1,14 @@
+
+<form [formGroup]="form" (ngSubmit)="createColumn()" class="column-form">
+    <h2>Create New Column</h2>
+  <div class="field">
+    <label for="name">Column Name *</label>
+    <input id="name" type="text" formControlName="name" placeholder="Enter column name" />
+  </div>
+
+  <div class="buttons">
+    <button type="submit" class="btn primary">Create Column</button>
+    <button type="button" class="btn cancel" (click)="cancel()">Cancel</button>
+
+  </div>
+</form>

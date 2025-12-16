@@ -11,8 +11,10 @@ import {
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { KanbanColumnComponent } from '../kanban-column/kanban-column';
-import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { MatDialog } from '@angular/material/dialog';
+import { ColumnModalComponent } from '../column-modal/column-modal';
 
 @Component({
   selector: 'app-kanban-board',
@@ -25,10 +27,10 @@ export class KanbanBoardComponent implements OnInit {
   columns = signal<Column[]>([]);
   leadsMap = signal<Map<number, Lead[]>>(new Map());
   connectedDropLists = signal<string[]>([]);
-  newColumnName = signal('');
 
   private columnsService = inject(ColumnsService);
   private leadsService = inject(LeadsService);
+  private dialog = inject(MatDialog);
 
   ngOnInit(): void {
     this.loadColumns();
@@ -37,7 +39,6 @@ export class KanbanBoardComponent implements OnInit {
   loadColumns() {
     this.columnsService.getAll().subscribe((cols: Column[]) => {
       this.columns.set(cols);
-      // build drop-list ids so lists can be connected for cross-column dragging
       this.connectedDropLists.set(cols.map(col => `drop-list-${col.id}`));
       cols.forEach((col: Column) => this.loadLeads(col.id));
     });
@@ -57,7 +58,6 @@ export class KanbanBoardComponent implements OnInit {
       return;
     }
 
-    // Optimistically update UI
     transferArrayItem(
       event.previousContainer.data,
       event.container.data,
@@ -65,12 +65,10 @@ export class KanbanBoardComponent implements OnInit {
       event.currentIndex
     );
 
-    // determine lead id (prefer item.data if provided)
     const lead = (event.item && (event.item.data as Lead)) || event.container.data[event.currentIndex];
     const leadId = lead?.id;
 
     if (!leadId) {
-      // fallback: reload lists to restore correct state
       this.reloadLeads();
       return;
     }
@@ -78,7 +76,6 @@ export class KanbanBoardComponent implements OnInit {
     this.leadsService.move(leadId, columnId).subscribe({
       next: () => this.reloadLeads(),
       error: () => {
-        // revert optimistic transfer
         transferArrayItem(
           event.container.data,
           event.previousContainer.data,
@@ -95,13 +92,17 @@ export class KanbanBoardComponent implements OnInit {
     this.columns().forEach(col => this.loadLeads(col.id));
   }
 
-  createColumn() {
-    const name = this.newColumnName().trim();
-    if (!name) return;
+  promptCreateColumn() {
+    const dialogRef = this.dialog.open(ColumnModalComponent, {
+      width: '450px'
+    });
 
-    this.columnsService.create(name).subscribe((res: any) => {
-      this.newColumnName.set('');
-      this.loadColumns();
+    dialogRef.afterClosed().subscribe((columnName: string | null) => {
+      if (columnName) {
+        this.columnsService.create(columnName).subscribe(() => {
+          this.loadColumns();
+        });
+      }
     });
   }
 } 

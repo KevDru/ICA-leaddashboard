@@ -3,13 +3,13 @@
   <h2>Edit Lead</h2>
 
   <form [formGroup]="form" (ngSubmit)="save()">
-    <label>Title</label>
+    <label>Title *</label>
     <input formControlName="title"/>
     <label>Customer</label>
     <input formControlName="customer"/>
     <label>Description</label>
     <textarea formControlName="description"></textarea>
-    <button type="submit">Save</button>
+    <button type="submit" [disabled]="!form.valid">Save</button>
     <button type="button" class="delete-btn" (click)="delete()">Delete Lead</button>
   </form>
 

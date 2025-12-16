@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, Optional, Inject } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormGroup, FormControl, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LeadsService } from '../../services/leads.services';
@@ -36,7 +36,7 @@ export class LeadDetailComponent implements OnInit {
     this.leadsService.getById(id).subscribe((l: Lead) => {
       this.lead.set(l);
       this.form = new FormGroup({
-        title: new FormControl(l.title),
+        title: new FormControl(l.title, [Validators.required, Validators.minLength(1)]),
         customer: new FormControl(l.customer),
         description: new FormControl(l.description)
       });
@@ -49,11 +49,19 @@ export class LeadDetailComponent implements OnInit {
   }
 
   save() {
-    if (!this.lead()) return;
+    if (!this.lead() || !this.form.valid) {
+      alert('Title is required');
+      return;
+    }
 
     this.leadsService.update(this.lead()!.id, this.form.value)
-      .subscribe(() => {
-        if (this.dialogRef) this.dialogRef.close(true); // notify parent
+      .subscribe({
+        next: () => {
+          if (this.dialogRef) this.dialogRef.close(true); // notify parent
+        },
+        error: (err) => {
+          alert(err.error?.error || 'Failed to save lead');
+        }
       });
   }
 
