@@ -1,4 +1,8 @@
 <div class="kanban-board">
+    <div class="new-column">
+    <input type="text" [value]="newColumnName()" (input)="newColumnName.set($any($event.target).value)" placeholder="New column name" />
+    <button (click)="createColumn()">Add Column</button>
+  </div>
   <div class="columns">
     @for (column of columns(); track column.id) {
       <app-kanban-column
@@ -6,7 +10,7 @@
         [leads]="leadsMap().get(column.id) || []"
         [connectedDropLists]="connectedDropLists()"
         (dropEvent)="drop($event, column.id)"
-        (reloadEvent)="reloadLeads()">
+        (reloadEvent)="loadColumns()">
       </app-kanban-column>
     }
     @empty {
@@ -14,8 +18,5 @@
     }
   </div>
 
-  <div class="new-column">
-    <input type="text" [value]="newColumnName()" (input)="newColumnName.set($any($event.target).value)" placeholder="New column name" />
-    <button (click)="createColumn()">Add Column</button>
-  </div>
+
 </div>

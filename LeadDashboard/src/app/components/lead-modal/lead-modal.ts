@@ -9,6 +9,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './lead-modal.html',
+  styleUrls: ['./lead-modal.scss']
 })
 export class LeadModalComponent {
   @Output() created = new EventEmitter<void>();

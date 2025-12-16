@@ -1,16 +1,26 @@
-<h2>New Lead</h2>
-<form [formGroup]="form" (ngSubmit)="createLead()">
-  <label>Title</label>
-  <input formControlName="title" />
-  
-  <label>Customer</label>
-  <input formControlName="customer" />
+<div class="lead-detail">
+  <h2>Create New Lead</h2>
+  <form [formGroup]="form" (ngSubmit)="createLead()">
+    <div class="field">
+      <label for="title">Title</label>
 
-  <label>Description</label>
-  <textarea formControlName="description"></textarea>
+      <input id="title" type="text" formControlName="title" placeholder="Enter lead title" />
+    </div>
 
-  <div class="buttons">
-    <button type="submit">Create</button>
-    <button type="button" (click)="cancel()">Cancel</button>
-  </div>
-</form>
+    <div class="field">
+      <label for="customer">Customer</label>
+
+      <input id="customer" type="text" formControlName="customer" placeholder="Customer name" />
+    </div>
+
+    <div class="field">
+      <label for="description">Description</label>
+      <textarea id="description" formControlName="description" placeholder="Optional description"></textarea>
+    </div>
+
+    <div class="buttons">
+      <button type="submit" class="primary">Create Lead</button>
+      <button type="button" class="cancel" (click)="cancel()">Cancel</button>
+    </div>
+  </form>
+</div>
