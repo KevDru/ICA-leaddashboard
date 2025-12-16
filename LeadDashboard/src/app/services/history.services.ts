@@ -4,7 +4,7 @@ import { LeadHistory } from '../models/history';
 
 @Injectable({ providedIn: 'root' })
 export class HistoryService {
-  private api = 'http://localhost/api/history';
+  private api = 'http://localhost/ICA-leaddashboard/ICA-leaddashboard/LeadDashboard/src/API/history.php';
   private http = inject(HttpClient);
 
   get(leadId: number) {

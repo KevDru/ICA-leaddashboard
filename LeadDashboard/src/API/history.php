@@ -13,7 +13,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require "db.php";
 
-$id = $_GET["lead_id"];
+if (!isset($_GET["lead_id"])) {
+    echo json_encode([]);
+    exit;
+}
+
+$id = (int) $_GET["lead_id"];
 
 $stmt = $pdo->prepare("SELECT * FROM lead_history WHERE lead_id=? ORDER BY id DESC");
 $stmt->execute([$id]);

@@ -19,7 +19,8 @@
         [lead]="lead"
         (refreshLeadEvent)="onRefreshLeads()"
         (deleteLeadEvent)="onRefreshLeads()"
-        cdkDrag>
+        cdkDrag
+        [cdkDragData]="lead">
       </app-lead-card>
     }
 

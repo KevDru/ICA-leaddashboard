@@ -52,21 +52,43 @@ export class KanbanBoardComponent implements OnInit {
   }
 
   drop(event: CdkDragDrop<Lead[]>, columnId: number) {
-    const lead = event.item.data as Lead;
-    
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    } else {
-      // persist move on backend, then reload authoritative lists
-      this.leadsService.move(lead.id, columnId).subscribe({
-        next: () => this.reloadLeads(),
-        error: () => {
-          // if move fails, revert the visual ordering
-          moveItemInArray(event.previousContainer.data, event.currentIndex, event.previousIndex);
-          alert('Failed to move lead');
-        }
-      });
+      return;
     }
+
+    // Optimistically update UI
+    transferArrayItem(
+      event.previousContainer.data,
+      event.container.data,
+      event.previousIndex,
+      event.currentIndex
+    );
+
+    // determine lead id (prefer item.data if provided)
+    const lead = (event.item && (event.item.data as Lead)) || event.container.data[event.currentIndex];
+    const leadId = lead?.id;
+
+    if (!leadId) {
+      // fallback: reload lists to restore correct state
+      this.reloadLeads();
+      return;
+    }
+
+    this.leadsService.move(leadId, columnId).subscribe({
+      next: () => this.reloadLeads(),
+      error: () => {
+        // revert optimistic transfer
+        transferArrayItem(
+          event.container.data,
+          event.previousContainer.data,
+          event.currentIndex,
+          event.previousIndex
+        );
+        alert('Failed to move lead');
+      }
+    });
+    return;
   }
 
   reloadLeads() {
