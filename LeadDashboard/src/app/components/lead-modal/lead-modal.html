@@ -1,0 +1,16 @@
+<h2>New Lead</h2>
+<form [formGroup]="form" (ngSubmit)="createLead()">
+  <label>Title</label>
+  <input formControlName="title" />
+  
+  <label>Customer</label>
+  <input formControlName="customer" />
+
+  <label>Description</label>
+  <textarea formControlName="description"></textarea>
+
+  <div class="buttons">
+    <button type="submit">Create</button>
+    <button type="button" (click)="cancel()">Cancel</button>
+  </div>
+</form>
