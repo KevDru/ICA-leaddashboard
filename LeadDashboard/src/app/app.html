@@ -2,9 +2,15 @@
 <header class="app-header">
   <div class="wrap">
     <div class="spacer"></div>
-    <span class="user">{{ u.name || u.email }}</span>
-    <button (click)="onLogout()">Afmelden</button>
-  </div>
+
+      <div class="info">
+        <span class="name">{{ userDisplayName }}</span>
+      </div>
+      <button class="logout" (click)="onLogout()">Afmelden</button>
+    </div>
+
 </header>
 }
-<router-outlet></router-outlet>
+<div class="app-content">
+  <router-outlet></router-outlet>
+</div>

@@ -48,10 +48,6 @@ export class AuthService {
     return this.http.post<{ success: boolean; user: User }>(`${this.base}/login.php`, { email, password }, this.opts);
   }
 
-  register(name: string, email: string, password: string) {
-    return this.http.post<{ success: boolean; user: User }>(`${this.base}/register.php`, { name, email, password }, this.opts);
-  }
-
   logout() {
     return this.http.post<{ success: boolean }>(`${this.base}/logout.php`, {}, this.opts);
   }

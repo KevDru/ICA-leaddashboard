@@ -60,13 +60,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id'] ?? null
     ]);
 
+    $newId = (int)$pdo->lastInsertId();
+    // Fetch author name if available
+    $authorName = null;
+    if (!empty($_SESSION['user_id'])) {
+        $u = $pdo->prepare('SELECT name FROM users WHERE id = ? LIMIT 1');
+        $u->execute([$_SESSION['user_id']]);
+        $row = $u->fetch(PDO::FETCH_ASSOC);
+        if ($row && isset($row['name'])) $authorName = $row['name'];
+    }
+
     echo json_encode([
         'success' => true,
         'note' => [
-            'id' => (int)$pdo->lastInsertId(),
+            'id' => $newId,
             'lead_id' => $lead_id,
             'content' => $content,
             'created_by' => $_SESSION['user_id'] ?? null,
+            'author_name' => $authorName,
             'created_at' => date('Y-m-d H:i:s')
         ]
     ]);

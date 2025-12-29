@@ -28,6 +28,8 @@ if (!$user || !password_verify($password, $user['password_hash'])) {
     exit;
 }
 
+
+
 $_SESSION['user_id'] = $user['id'];
 
 echo json_encode([

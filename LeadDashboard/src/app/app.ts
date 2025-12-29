@@ -24,4 +24,21 @@ export class AppComponent {
       this.router.navigateByUrl('/login');
     });
   }
+
+  get userDisplayName(): string {
+    const u = this.auth.user();
+    if (!u) return '';
+    return (u.name && u.name.trim()) ? u.name as string : u.email;
+  }
+
+  get userInitials(): string {
+    const u = this.auth.user();
+    if (!u) return '';
+    const source = (u.name && u.name.trim()) ? (u.name as string) : (u.email.split('@')[0] || u.email);
+    const parts = source.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return source.slice(0, 2).toUpperCase();
+  }
 }
