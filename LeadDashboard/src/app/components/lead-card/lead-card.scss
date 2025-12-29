@@ -9,6 +9,23 @@
   &:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
   }
+
+  .creator {
+    display: block;
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.5rem;
+  }
+
+  .days-since-update {
+    display: inline-block;
+    font-size: 0.75rem;
+    background: #f0f0f0;
+    color: #666;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    margin-top: 0.5rem;
+  }
 }
 
 button {

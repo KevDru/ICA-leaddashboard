@@ -6,9 +6,10 @@ import { Column } from '../models/column';
 export class ColumnsService {
   private api = 'http://localhost/ICA-leaddashboard/ICA-leaddashboard/LeadDashboard/src/API/lead_columns.php';
   private http = inject(HttpClient);
+  private opts = { withCredentials: true } as const;
 
-  getAll() { return this.http.get<Column[]>(this.api); }
-  create(name: string) { return this.http.post(this.api, { name }); }
-  update(id: number, data: Partial<Column>) { return this.http.put(`${this.api}?id=${id}`, data); }
-  delete(id: number) { return this.http.delete(`${this.api}?id=${id}`); }
+  getAll() { return this.http.get<Column[]>(this.api, this.opts); }
+  create(name: string) { return this.http.post(this.api, { name }, this.opts); }
+  update(id: number, data: Partial<Column>) { return this.http.put(`${this.api}?id=${id}`, data, this.opts); }
+  delete(id: number) { return this.http.delete(`${this.api}?id=${id}`, this.opts); }
 }

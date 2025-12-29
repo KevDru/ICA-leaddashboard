@@ -1,5 +1,9 @@
 <div class="lead-card" (click)="openDetailModal()">
   <h4>{{ lead.title }}</h4>
   <p>{{ lead.customer }}</p>
+  @if (lead.creator_name) {
+    <span class="creator">door {{ lead.creator_name }}</span>
+  }
+  <span class="days-since-update">{{ getDaysSinceUpdate() }}d</span>
   <button (click)="deleteLead(); $event.stopPropagation()">×</button>
 </div>

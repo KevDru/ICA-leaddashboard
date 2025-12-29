@@ -1,0 +1,10 @@
+@if (auth.user(); as u) {
+<header class="app-header">
+  <div class="wrap">
+    <div class="spacer"></div>
+    <span class="user">{{ u.name || u.email }}</span>
+    <button (click)="onLogout()">Afmelden</button>
+  </div>
+</header>
+}
+<router-outlet></router-outlet>

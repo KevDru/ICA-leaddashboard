@@ -1,34 +1,19 @@
 <?php
-require "db.php";
+require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/db.php';
 
-// ----------------------
-// Enable error reporting (for dev)
-// ----------------------
+// Enable error reporting in dev
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // ----------------------
-// CORS headers
-// ----------------------
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-$allowedOrigins = ['http://localhost:4200'];
-
-// CORS headers
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-
-// Preflight
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-// ----------------------
 // Determine HTTP method
 // ----------------------
 $method = $_SERVER['REQUEST_METHOD'];
+
+// Require auth for all methods except OPTIONS
+ensure_authenticated();
 
 // ----------------------
 // GET: fetch all columns

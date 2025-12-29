@@ -1,24 +1,21 @@
 <?php
-// CORS headers
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-
-// Preflight
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-    
-
-require "db.php";
+require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/db.php';
 
 $method = $_SERVER["REQUEST_METHOD"];
+
+// Require auth for all methods except OPTIONS
+ensure_authenticated();
 
 if ($method === "GET") {
     // Get single lead by ID
     if (isset($_GET["id"])) {
-        $stmt = $pdo->prepare("SELECT * FROM leads WHERE id = ?");
+        $stmt = $pdo->prepare("
+            SELECT l.*, u.name as creator_name 
+            FROM leads l 
+            LEFT JOIN users u ON l.created_by = u.id 
+            WHERE l.id = ?
+        ");
         $stmt->execute([$_GET["id"]]);
         echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
         exit;
@@ -26,7 +23,13 @@ if ($method === "GET") {
 
     // Get all leads in a column
     if (isset($_GET["column_id"])) {
-        $stmt = $pdo->prepare("SELECT * FROM leads WHERE column_id = ? ORDER BY id DESC");
+        $stmt = $pdo->prepare("
+            SELECT l.*, u.name as creator_name 
+            FROM leads l 
+            LEFT JOIN users u ON l.created_by = u.id 
+            WHERE l.column_id = ? 
+            ORDER BY l.id DESC
+        ");
         $stmt->execute([$_GET["column_id"]]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
@@ -40,21 +43,22 @@ if ($method === "POST") {
     $data = json_decode(file_get_contents("php://input"), true);
 
     $stmt = $pdo->prepare("
-        INSERT INTO leads (title, customer, description, column_id)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO leads (title, customer, description, column_id, created_by)
+        VALUES (?, ?, ?, ?, ?)
     ");
     $stmt->execute([
         $data["title"],
         $data["customer"],
         $data["description"] ?? null,
-        $data["column_id"]
+        $data["column_id"],
+        $_SESSION['user_id'] ?? null
     ]);
 
     $id = $pdo->lastInsertId();
 
     // history
-    $pdo->prepare("INSERT INTO lead_history (lead_id, action) VALUES (?, 'Lead created')")
-        ->execute([$id]);
+    $pdo->prepare("INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, 'Lead aangemaakt', ?)")
+        ->execute([$id, $_SESSION['user_id']??null]);
 
     echo json_encode(["success" => true, "id" => $id]);
     exit;
@@ -75,8 +79,8 @@ if ($method === "PUT") {
         $column = $colStmt->fetch(PDO::FETCH_ASSOC);
         $columnName = $column ? $column['name'] : 'Unknown';
 
-        $pdo->prepare("INSERT INTO lead_history (lead_id, action) VALUES (?, ?)")
-            ->execute([$id, 'Moved to column "' . $columnName . '"']);
+        $pdo->prepare("INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, ?, ?)")
+            ->execute([$id, 'Verplaatst naar kolom "' . $columnName . '"', $_SESSION['user_id']??null]);
 
         echo json_encode(["success" => true]);
         exit;
@@ -96,8 +100,8 @@ if ($method === "PUT") {
     $stmt = $pdo->prepare("UPDATE leads SET title=?, customer=?, description=? WHERE id=?");
     $stmt->execute([$data["title"], $data["customer"], $data["description"], $id]);
 
-    $pdo->prepare("INSERT INTO lead_history (lead_id, action) VALUES (?, 'Lead updated')")
-        ->execute([$id]);
+    $pdo->prepare("INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, 'Lead bijgewerkt', ?)")
+        ->execute([$id, $_SESSION['user_id']??null]);
 
     echo json_encode(["success" => true]);
 }

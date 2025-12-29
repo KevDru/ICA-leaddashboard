@@ -1,0 +1,507 @@
+================================================================================
+                        ACCEPTATIETEST TICKETINGSYSTEEM
+================================================================================
+
+Project: ICA Ticketingsysteem
+Datum: 29 december 2025
+Versie: 1.0
+
+
+================================================================================
+1. VOORBEREIDING
+================================================================================
+
+1.1 Database Setup
+   [ ] Navigeer naar: http://localhost/.../src/API/tickets/setup.php
+   [ ] Verificeer: {"success":true,"message":"Tickets table is ready"}
+   [ ] Navigeer naar: http://localhost/.../src/API/users/setup_users.php
+   [ ] Verificeer: {"success":true,"message":"Users table is ready"}
+
+1.2 Test Users Aanmaken
+   [ ] Navigeer naar: http://localhost/.../src/API/users/seed_users.php
+   [ ] Verificeer dat test users zijn aangemaakt
+
+1.3 Admin User Instellen
+   [ ] Open phpMyAdmin of MySQL client
+   [ ] Voer uit: UPDATE users SET role = 'admin' WHERE email = 'test@example.com';
+   [ ] Verificeer: 1 row affected
+
+1.4 Applicatie Starten
+   [ ] Open terminal in project folder
+   [ ] Voer uit: npm start
+   [ ] Verificeer: Applicatie draait op http://localhost:4200
+
+
+================================================================================
+2. ALGEMENE FUNCTIONALITEIT
+================================================================================
+
+2.1 Homepage Toegankelijkheid
+   [ ] Open browser naar: http://localhost:4200
+   [ ] Verificeer: Homepage wordt correct geladen
+   [ ] Verificeer: Header is zichtbaar met logo
+   [ ] Verificeer: Navigatiemenu is zichtbaar (Home, Ticket aanmaken, Ticket volgen, Login)
+
+2.2 Navigatie
+   [ ] Klik op "Home" in header
+   [ ] Verificeer: Homepage wordt getoond
+   [ ] Klik op "Ticket aanmaken"
+   [ ] Verificeer: Ticket formulier wordt getoond
+   [ ] Klik op "Ticket volgen"
+   [ ] Verificeer: Redirect naar login (als niet ingelogd)
+
+
+================================================================================
+3. AUTHENTICATIE
+================================================================================
+
+3.1 Inloggen - Succesvolle Login
+   [ ] Navigeer naar: /login
+   [ ] Vul in: Email: test@example.com
+   [ ] Vul in: Password: password123
+   [ ] Klik op "Login" knop
+   [ ] Verificeer: Redirect naar /home
+   [ ] Verificeer: Header toont "Logout" i.p.v. "Login"
+   [ ] Verificeer: Header toont "Admin Dashboard" link (alleen voor admin)
+   [ ] Verificeer: Geen page refresh nodig voor header update
+
+3.2 Inloggen - Ongeldige Credentials
+   [ ] Navigeer naar: /login
+   [ ] Vul in: Email: test@example.com
+   [ ] Vul in: Password: verkeerd_wachtwoord
+   [ ] Klik op "Login" knop
+   [ ] Verificeer: Error bericht "Invalid email or password"
+   [ ] Verificeer: Blijft op login pagina
+
+3.3 Uitloggen
+   [ ] Klik op "Logout" in header
+   [ ] Verificeer: Redirect naar /login
+   [ ] Verificeer: Header toont "Login" i.p.v. "Logout"
+   [ ] Verificeer: "Admin Dashboard" link verdwijnt
+   [ ] Verificeer: LocalStorage is leeg (user, auth_token)
+
+
+================================================================================
+4. TICKET AANMAKEN (NIET INGELOGD)
+================================================================================
+
+4.1 Ticket Formulier - Validatie
+   [ ] Navigeer naar: /create-ticket (uitgelogd)
+   [ ] Klik op "Submit Ticket" zonder invullen
+   [ ] Verificeer: Validatie errors worden getoond
+   [ ] Verificeer: "Name is required (min 3 characters)"
+   [ ] Verificeer: "Valid email is required"
+   [ ] Verificeer: "Subject is required"
+   [ ] Verificeer: "Description is required"
+
+4.2 Ticket Aanmaken - Succesvolle Aanmaak
+   [ ] Vul in: Name: Test Gebruiker
+   [ ] Vul in: Email: test@test.nl
+   [ ] Vul in: Subject: Test Ticket
+   [ ] Selecteer: Priority: High
+   [ ] Vul in: Description: Dit is een test ticket
+   [ ] Klik op "Submit Ticket"
+   [ ] Verificeer: Succes bericht wordt getoond
+   [ ] Verificeer: Redirect naar /home na 2 seconden
+   [ ] Verificeer: Formulier is gereset
+
+4.3 Database Verificatie
+   [ ] Open database
+   [ ] Check tickets tabel
+   [ ] Verificeer: Nieuw ticket is aangemaakt
+   [ ] Verificeer: user_id = NULL (anoniem ticket)
+   [ ] Verificeer: requester_name = "Test Gebruiker"
+   [ ] Verificeer: requester_email = "test@test.nl"
+
+
+================================================================================
+5. TICKET AANMAKEN (INGELOGD)
+================================================================================
+
+5.1 Auto-Fill Gebruikersgegevens
+   [ ] Log in als test@example.com
+   [ ] Navigeer naar: /create-ticket
+   [ ] Verificeer: Name veld is vooringevuld met "test"
+   [ ] Verificeer: Email veld is vooringevuld met "test@example.com"
+   [ ] Verificeer: Name veld is disabled (grijs)
+   [ ] Verificeer: Email veld is disabled (grijs)
+
+5.2 Ticket Aanmaken als Ingelogde Gebruiker
+   [ ] Vul in: Subject: Ingelogd Test Ticket
+   [ ] Selecteer: Priority: Medium
+   [ ] Vul in: Description: Test
+   [ ] Klik op "Submit Ticket"
+   [ ] Verificeer: Succes bericht
+   [ ] Verificeer: Redirect naar /home
+
+5.3 Database Verificatie Ingelogd Ticket
+   [ ] Check database tickets tabel
+   [ ] Verificeer: user_id is ingevuld met user ID
+   [ ] Verificeer: requester_name = "test"
+   [ ] Verificeer: requester_email = "test@example.com"
+
+
+================================================================================
+6. MIJN TICKETS (USER)
+================================================================================
+
+6.1 Toegang Mijn Tickets
+   [ ] Log in als test@example.com
+   [ ] Klik op "Ticket volgen" in header
+   [ ] Verificeer: /my-tickets pagina wordt getoond
+   [ ] Verificeer: "Mijn Tickets" header is zichtbaar
+   [ ] Verificeer: "Nieuw Ticket" knop is zichtbaar
+
+6.2 Tickets Weergave
+   [ ] Verificeer: Alle tickets van ingelogde user worden getoond
+   [ ] Verificeer: Elk ticket toont:
+       - Ticket nummer (#ID)
+       - Subject/titel
+       - Description (max 3 regels)
+       - Priority badge (met correcte kleur)
+       - Status badge (met correcte kleur)
+       - Aanmaakdatum
+       - "Verwijder" knop
+
+6.3 Empty State
+   [ ] Log in met user zonder tickets
+   [ ] Navigeer naar: /my-tickets
+   [ ] Verificeer: "Je hebt nog geen tickets aangemaakt" wordt getoond
+   [ ] Verificeer: "Maak je eerste ticket aan" knop is zichtbaar
+   [ ] Klik op knop
+   [ ] Verificeer: Redirect naar /create-ticket
+
+6.4 Ticket Verwijderen
+   [ ] Navigeer naar: /my-tickets (met tickets)
+   [ ] Klik op "Verwijder" knop bij een ticket
+   [ ] Verificeer: Confirm dialog verschijnt
+   [ ] Klik "Cancel"
+   [ ] Verificeer: Ticket blijft staan
+   [ ] Klik opnieuw "Verwijder"
+   [ ] Klik "OK" in confirm dialog
+   [ ] Verificeer: Ticket verdwijnt uit lijst
+   [ ] Verificeer: Database: ticket is verwijderd
+
+6.5 Hover Effects
+   [ ] Hover over "Nieuw Ticket" knop
+   [ ] Verificeer: Achtergrond wordt geel (#FEBA31)
+   [ ] Verificeer: Tekst wordt zwart
+   [ ] Verificeer: Knop beweegt omhoog (translateY)
+   [ ] Hover over "Verwijder" knop
+   [ ] Verificeer: Achtergrond wordt donkerrood
+   [ ] Verificeer: Tekst wordt wit
+
+
+================================================================================
+7. ADMIN DASHBOARD
+================================================================================
+
+7.1 Toegang Admin Dashboard
+   [ ] Log in als admin (test@example.com met role=admin)
+   [ ] Verificeer: "Admin Dashboard" link zichtbaar in header
+   [ ] Klik op "Admin Dashboard"
+   [ ] Verificeer: /admin pagina wordt geladen
+   [ ] Verificeer: "Admin Dashboard" header zichtbaar
+
+7.2 Toegang Weigering Niet-Admin
+   [ ] Log in als normale user (bob@example.com)
+   [ ] Verificeer: "Admin Dashboard" link NIET zichtbaar
+   [ ] Probeer direct naar /admin te navigeren
+   [ ] Verificeer: Redirect naar /home
+   [ ] Verificeer: Geen toegang tot admin functies
+
+7.3 Tickets Overzicht
+   [ ] Als admin op /admin
+   [ ] Verificeer: Tabel met alle tickets (van alle users)
+   [ ] Verificeer: Kolommen: ID, Title, Requester, Priority, Status, Created, Actions
+   [ ] Verificeer: Requester toont naam en email
+   [ ] Klik op "Refresh" knop
+   [ ] Verificeer: Tickets worden opnieuw geladen
+
+7.4 Ticket Bewerken - Modal Openen
+   [ ] Klik op "Edit" bij een ticket
+   [ ] Verificeer: Modal overlay verschijnt
+   [ ] Verificeer: Modal toont "Edit Ticket #[ID]"
+   [ ] Verificeer: Title, Description, Status, Priority velden tonen huidige waarden
+   [ ] Klik buiten modal
+   [ ] Verificeer: Modal sluit
+
+7.5 Ticket Bewerken - Wijzigingen Opslaan
+   [ ] Klik "Edit" bij een ticket
+   [ ] Wijzig Title naar: "Aangepaste Titel"
+   [ ] Wijzig Status naar: "In Progress"
+   [ ] Wijzig Priority naar: "Urgent"
+   [ ] Klik "Save Changes"
+   [ ] Verificeer: Modal sluit
+   [ ] Verificeer: Tabel toont nieuwe waarden
+   [ ] Verificeer: Database bevat nieuwe waarden
+
+7.6 Ticket Bewerken - Annuleren
+   [ ] Klik "Edit" bij een ticket
+   [ ] Wijzig enkele velden
+   [ ] Klik "Cancel"
+   [ ] Verificeer: Modal sluit
+   [ ] Verificeer: Wijzigingen zijn niet opgeslagen
+
+7.7 Ticket Verwijderen als Admin
+   [ ] Klik "Delete" bij een ticket
+   [ ] Verificeer: Confirm dialog
+   [ ] Klik "OK"
+   [ ] Verificeer: Ticket verdwijnt
+   [ ] Verificeer: Database: ticket is verwijderd
+   [ ] Verificeer: Admin kan tickets van andere users verwijderen
+
+
+================================================================================
+8. RESPONSIVE DESIGN
+================================================================================
+
+8.1 Mobile View (< 768px)
+   [ ] Resize browser naar 375px breedte
+   [ ] Verificeer: Header stapelt verticaal
+   [ ] Verificeer: Navigatie toont volledig menu
+   [ ] Verificeer: Ticket cards tonen 1 kolom
+   [ ] Verificeer: Admin tabel scrollbaar horizontaal
+   [ ] Verificeer: Formulieren blijven bruikbaar
+
+8.2 Tablet View (768px - 1024px)
+   [ ] Resize browser naar 800px breedte
+   [ ] Verificeer: Ticket grid toont 2 kolommen
+   [ ] Verificeer: Admin tabel past op scherm
+   [ ] Verificeer: Alle functionaliteit werkt
+
+8.3 Desktop View (> 1024px)
+   [ ] Resize browser naar 1440px breedte
+   [ ] Verificeer: Maximale breedte containers (1200px/1400px)
+   [ ] Verificeer: Optimale spacing en layout
+
+
+================================================================================
+9. VISUELE STYLING
+================================================================================
+
+9.1 Border Radius (Scherpe Design)
+   [ ] Inspecteer buttons
+   [ ] Verificeer: border-radius: 0.125rem (scherpe hoeken)
+   [ ] Inspecteer containers
+   [ ] Verificeer: border-radius: 0.25rem
+   [ ] Verificeer: Consistente scherpe vormgeving
+
+9.2 Hover States
+   [ ] Hover over alle zwarte buttons
+   [ ] Verificeer: Achtergrond #FEBA31 (geel)
+   [ ] Verificeer: Tekst wordt zwart
+   [ ] Verificeer: Transform translateY(-1px)
+   [ ] Hover over navigatie links
+   [ ] Verificeer: Underline verschijnt
+   [ ] Verificeer: Kleur wordt #FEBA31
+
+9.3 Color Scheme
+   [ ] Verificeer Priority kleuren:
+       - Low: groen (#e8f5e9 / #2e7d32)
+       - Medium: oranje (#fff3e0 / #ef6c00)
+       - High: rood (#ffebee / #c62828)
+       - Urgent: paars (#f3e5f5 / #6a1b9a)
+   [ ] Verificeer Status kleuren:
+       - Open: blauw (#e3f2fd / #1565c0)
+       - In Progress: oranje (#fff3e0 / #ef6c00)
+       - Resolved: groen (#e8f5e9 / #2e7d32)
+       - Closed: grijs (#f5f5f5 / #616161)
+
+
+================================================================================
+10. SECURITY & PERMISSIONS
+================================================================================
+
+10.1 JWT Token Verificatie
+   [ ] Log in
+   [ ] Open DevTools Console
+   [ ] Check: localStorage.getItem('auth_token')
+   [ ] Verificeer: Token is aanwezig
+   [ ] Check: localStorage.getItem('user')
+   [ ] Verificeer: User object met role
+
+10.2 API Authorization Headers
+   [ ] Als ingelogde user
+   [ ] Open Network tab
+   [ ] Navigeer naar /my-tickets
+   [ ] Inspecteer request naar my_tickets.php
+   [ ] Verificeer: Authorization header aanwezig
+   [ ] Verificeer: "Bearer [token]" format
+
+10.3 Protected Routes
+   [ ] Log uit
+   [ ] Probeer /my-tickets te bezoeken
+   [ ] Verificeer: Redirect naar /login
+   [ ] Probeer /admin te bezoeken
+   [ ] Verificeer: Redirect naar /home
+
+10.4 API Endpoint Protection
+   [ ] Test endpoints zonder token:
+       GET /my_tickets.php → 401 Unauthorized
+       GET /ticket_list.php → 401 Unauthorized
+       DELETE /ticket_delete.php?id=1 → 401 Unauthorized
+   [ ] Test admin endpoints als user:
+       GET /ticket_list.php (as user) → 403 Forbidden
+
+10.5 Delete Permissions
+   [ ] Log in als user A
+   [ ] Probeer ticket van user B te verwijderen (via API)
+   [ ] Verificeer: 403 Forbidden
+   [ ] Log in als admin
+   [ ] Verwijder ticket van andere user
+   [ ] Verificeer: 200 Success
+
+
+================================================================================
+11. ERROR HANDLING
+================================================================================
+
+11.1 Netwerk Errors
+   [ ] Stop backend server (Laragon)
+   [ ] Probeer in te loggen
+   [ ] Verificeer: Error bericht wordt getoond
+   [ ] Verificeer: Loading state stopt
+   [ ] Herstart server
+   [ ] Verificeer: Functionaliteit hersteld
+
+11.2 Invalid Data
+   [ ] Probeer ticket aan te maken met alleen spaties
+   [ ] Verificeer: Validatie error
+   [ ] Probeer ongeldig email formaat
+   [ ] Verificeer: "Valid email is required"
+
+11.3 Session Expiry
+   [ ] Log in
+   [ ] Wacht 1 uur (of pas JWT expiry aan naar 60 sec)
+   [ ] Probeer protected actie (ticket aanmaken)
+   [ ] Verificeer: 401 response
+   [ ] Verificeer: Auto-logout en redirect naar /login
+
+
+================================================================================
+12. DATABASE INTEGRITEIT
+================================================================================
+
+12.1 Data Mapping
+   [ ] Maak ticket aan via frontend
+   [ ] Check database
+   [ ] Verificeer: created_at is gevuld
+   [ ] Verificeer: updated_at is NULL (nieuwe record)
+   [ ] Update ticket als admin
+   [ ] Verificeer: updated_at is nu gevuld
+
+12.2 Foreign Key Relaties
+   [ ] Check user_id in tickets tabel
+   [ ] Verificeer: user_id NULL voor anonieme tickets
+   [ ] Verificeer: user_id gevuld voor ingelogde users
+   [ ] Verificeer: user_id komt voor in users tabel
+
+12.3 Field Mapping (snake_case → camelCase)
+   [ ] Open Network tab
+   [ ] Laad /my-tickets
+   [ ] Inspecteer response van my_tickets.php
+   [ ] Verificeer response bevat:
+       - subject (niet title)
+       - userId (niet user_id)
+       - createdAt (niet created_at)
+       - updatedAt (niet updated_at)
+
+
+================================================================================
+13. PERFORMANCE
+================================================================================
+
+13.1 Laadtijden
+   [ ] Open Network tab
+   [ ] Clear cache
+   [ ] Laad homepage
+   [ ] Verificeer: Pagina laadt < 2 seconden
+   [ ] Laad /my-tickets met 10+ tickets
+   [ ] Verificeer: Lijst laadt < 1 seconde
+
+13.2 API Response Times
+   [ ] Monitor API calls in Network tab
+   [ ] Verificeer: ticket_list.php < 500ms
+   [ ] Verificeer: my_tickets.php < 500ms
+   [ ] Verificeer: login.php < 300ms
+
+
+================================================================================
+14. CROSS-BROWSER TESTING
+================================================================================
+
+14.1 Chrome
+   [ ] Test alle functionaliteit in Chrome
+   [ ] Verificeer: Alles werkt correct
+
+14.2 Firefox
+   [ ] Test alle functionaliteit in Firefox
+   [ ] Verificeer: Styling en functionaliteit identiek
+
+14.3 Edge
+   [ ] Test alle functionaliteit in Edge
+   [ ] Verificeer: Geen compatibility issues
+
+
+================================================================================
+15. ACCEPTATIE CRITERIA
+================================================================================
+
+MUST HAVE (Verplicht):
+   [X] Users kunnen tickets aanmaken (ingelogd en niet-ingelogd)
+   [X] Ingelogde users zien alleen hun eigen tickets
+   [X] Users kunnen hun eigen tickets verwijderen
+   [X] Admin kan alle tickets zien en beheren
+   [X] Admin kan alle tickets verwijderen
+   [X] Admin kan ticket status en priority aanpassen
+   [X] JWT authenticatie werkt correct
+   [X] Role-based access control functioneert
+   [X] Responsive design voor mobile/tablet/desktop
+
+SHOULD HAVE (Gewenst):
+   [X] Auto-fill van gebruikersgegevens bij ingelogde users
+   [X] Confirm dialogs bij verwijderen
+   [X] Succes/error meldingen bij acties
+   [X] Consistent hover states en styling
+   [X] Database field mapping (snake_case → camelCase)
+
+NICE TO HAVE (Bonus):
+   [X] Scherp modern design (minimale border-radius)
+   [X] Gele accent kleur (#FEBA31) bij hover
+   [X] Smooth transitions en animations
+   [X] Empty states met call-to-actions
+
+
+================================================================================
+16. BUGS & ISSUES LOG
+================================================================================
+
+Gevonden Bugs:
+   [ ] Bug #: ___________
+       Beschrijving: ______________________________
+       Stappen: ____________________________________
+       Expected: ___________________________________
+       Actual: _____________________________________
+       Prioriteit: [ ] Critical [ ] High [ ] Medium [ ] Low
+
+
+================================================================================
+17. FINAL SIGN-OFF
+================================================================================
+
+Getest door: _______________________
+Datum: _____________________________
+Handtekening: ______________________
+
+Status: [ ] GOEDGEKEURD  [ ] AFGEKEURD  [ ] NEEDS REVISION
+
+Opmerkingen:
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+
+
+================================================================================
+                              EINDE ACCEPTATIETEST
+================================================================================

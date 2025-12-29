@@ -21,9 +21,18 @@ export class LeadCardComponent {
   private dialog = inject(MatDialog);
   private leadsService = inject(LeadsService);
 
+  getDaysSinceUpdate(): number {
+    if (!this.lead.updated_at) return 0;
+    const updateDate = new Date(this.lead.updated_at);
+    const today = new Date();
+    const diffMs = today.getTime() - updateDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    return diffDays;
+  }
+
   openDetailModal() {
     const dialogRef = this.dialog.open(LeadDetailComponent, {
-      width: '600px',
+      width: '800px',
       data: { id: this.lead.id }
     });
 
@@ -33,7 +42,7 @@ export class LeadCardComponent {
   }
 
   deleteLead() {
-    if (!confirm('Are you sure you want to delete this lead?')) return;
+    if (!confirm('Weet je zeker dat je deze lead wilt verwijderen?')) return;
     
     this.leadsService.delete(this.lead.id).subscribe(() => {
       this.refreshLeadEvent.emit(); // notify parent to refresh list

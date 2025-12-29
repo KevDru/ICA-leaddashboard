@@ -48,8 +48,9 @@ export class KanbanColumnComponent implements OnChanges {
   }
 
   deleteColumn() {
-    if (!confirm(`Delete column "${this.column.name}"? This cannot be undone.`)) return;
+    if (!confirm(`Kolom "${this.column.name}" verwijderen? Dit kan niet ongedaan gemaakt worden.`)) return;
 
+    
     this.columnsService.delete(this.column.id).subscribe({
       next: () => this.reloadEvent.emit(),
       error: (err) => alert(err.error?.error || 'Failed to delete column')

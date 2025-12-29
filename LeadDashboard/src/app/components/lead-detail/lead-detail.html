@@ -1,26 +1,93 @@
 @if (lead(); as l) {
 <div class="lead-detail">
-  <h2>Edit Lead</h2>
+  <h2>Lead bewerken</h2>
 
   <form [formGroup]="form" (ngSubmit)="save()">
-    <label>Title *</label>
+    <label>Titel *</label>
     <input formControlName="title"/>
-    <label>Customer</label>
+    <label>Klant</label>
     <input formControlName="customer"/>
-    <label>Description</label>
+    <label>Beschrijving</label>
     <textarea formControlName="description"></textarea>
-    <button type="submit" [disabled]="!form.valid">Save</button>
-    <button type="button" class="delete-btn" (click)="delete()">Delete Lead</button>
+    <button type="submit" [disabled]="!form.valid">Opslaan</button>
+    <button type="button" class="delete-btn" (click)="delete()">Lead verwijderen</button>
   </form>
 
-  <h3>History</h3>
-  <ul>
-    @for (h of history(); track h.id) {
-      <li>{{ h.action }} at {{ h.created_at }}</li>
-    }
-    @empty {
-      <li>No history available</li>
-    }
-  </ul>
+  <h3 (click)="toggleNotes()" class="collapsible-header">
+    <span class="toggle">{{ notesExpanded() ? '▼' : '▶' }}</span>
+    Notities
+  </h3>
+  @if (notesExpanded()) {
+    <div class="notes-section">
+      <form [formGroup]="noteForm" (ngSubmit)="addNote()" class="note-form">
+        <textarea formControlName="content" placeholder="Voeg een notitie toe..."></textarea>
+        <button type="submit" [disabled]="!noteForm.valid">Notitie toevoegen</button>
+      </form>
+      <ul>
+        @for (n of notes(); track n.id) {
+          <li class="note-item">
+            <div class="note-content">{{ n.content }}</div>
+            <div class="note-meta">
+              @if (n.author_name) {
+                <span class="author">door {{ n.author_name }}</span>
+              }
+              <span class="date">{{ n.created_at | date: 'short' }}</span>
+            </div>
+            <button type="button" class="delete-btn" (click)="deleteNote(n.id)">×</button>
+          </li>
+        }
+        @empty {
+          <li class="empty">Nog geen notities</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <h3 (click)="toggleAttachments()" class="collapsible-header">
+    <span class="toggle">{{ attachmentsExpanded() ? '▼' : '▶' }}</span>
+    Bijlagen
+  </h3>
+  @if (attachmentsExpanded()) {
+    <div class="attachments-section">
+      <input type="file" (change)="onFileSelected($event)" />
+      @if (uploadError()) {
+        <p class="error">{{ uploadError() }}</p>
+      }
+      <ul>
+        @for (a of attachments(); track a.id) {
+          <li class="attachment-item">
+            <span class="name" (click)="downloadAttachment(a)">📄 {{ a.file_name }}</span>
+            @if (a.uploader_name) {
+              <span class="uploader">door {{ a.uploader_name }}</span>
+            }
+            <button type="button" class="delete-btn" (click)="deleteAttachment(a.id)">×</button>
+          </li>
+        }
+        @empty {
+          <li>Geen bijlagen</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <h3 (click)="toggleHistory()" class="collapsible-header">
+    <span class="toggle">{{ historyExpanded() ? '▼' : '▶' }}</span>
+    Geschiedenis
+  </h3>
+  @if (historyExpanded()) {
+    <ul>
+      @for (h of history(); track h.id) {
+        <li>
+          {{ h.action }}
+          @if (h.user_name) { <span class="user">door {{ h.user_name }}</span> }
+          <span class="time"> op {{ h.created_at }}</span>
+        </li>
+      }
+      @empty {
+        <li>Geen geschiedenis beschikbaar</li>
+      }
+    </ul>
+  }
 </div>
 }
+
