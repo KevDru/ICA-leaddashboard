@@ -4,15 +4,15 @@ require "db.php";
 // ----------------------
 // Enable error reporting (for dev)
 // ----------------------
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 
 // ----------------------
 // CORS headers
 // ----------------------
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-$allowedOrigins = ['http://localhost:4200'];
+$allowedOrigins = ['http://localhost:4200','https://leads.imaginecreativeagency.nl'];
 
 // CORS headers
 header("Access-Control-Allow-Origin: *");
