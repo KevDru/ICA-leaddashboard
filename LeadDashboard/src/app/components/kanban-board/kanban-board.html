@@ -1,0 +1,22 @@
+<div class="kanban-board">
+  <div class="columns-wrapper">
+    <div class="columns">
+      @for (column of columns(); track column.id) {
+        <app-kanban-column
+          [column]="column"
+          [leads]="leadsMap().get(column.id) || []"
+          [connectedDropLists]="connectedDropLists()"
+          (dropEvent)="drop($event, column.id)"
+          (reloadEvent)="loadColumns()">
+        </app-kanban-column>
+      }
+      @empty {
+        <p>Geen kolommen gevonden</p>
+      }
+    </div>
+
+    <button class="add-column-btn" (click)="promptCreateColumn()" title="Voeg nieuwe kolom toe">
+      +
+    </button>
+  </div>
+</div>

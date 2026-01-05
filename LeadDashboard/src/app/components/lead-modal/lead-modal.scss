@@ -1,0 +1,80 @@
+.lead-detail {
+  max-width: 600px;
+  margin: auto;
+  padding: 10px;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      label {
+        font-weight: 600;
+      }
+
+      input,
+      textarea {
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        border: 1px solid #ccc;
+       
+        transition: border-color 0.2s;
+
+        &:focus {
+          border-color: #393c42 ;
+          outline: none;
+        }
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+    }
+
+    .buttons {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+
+      .cancel {
+        background: #393c42;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.2s;
+
+        &:hover {
+          opacity: 0.85;
+        }
+      }
+
+      .primary {
+        background: #393c42;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.2s;
+
+        &:hover {
+          opacity: 0.85;
+        }
+      }
+    }
+  }
+}
+.buttons{
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  flex-direction: column;
+}

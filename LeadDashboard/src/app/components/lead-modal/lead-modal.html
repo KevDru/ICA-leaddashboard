@@ -1,0 +1,26 @@
+<div class="lead-detail">
+  <h2>Nieuwe lead aanmaken</h2>
+  <form [formGroup]="form" (ngSubmit)="createLead()">
+    <div class="field">
+      <label for="title">Titel</label>
+
+      <input id="title" type="text" formControlName="title" placeholder="Voer leadtitel in" />
+    </div>
+
+    <div class="field">
+      <label for="customer">Klant</label>
+
+      <input id="customer" type="text" formControlName="customer" placeholder="Klantnaam" />
+    </div>
+
+    <div class="field">
+      <label for="description">Beschrijving</label>
+      <textarea id="description" formControlName="description" placeholder="Optionele beschrijving"></textarea>
+    </div>
+
+    <div class="buttons">
+      <button type="submit" class="primary">Lead aanmaken</button>
+      <button type="button" class="cancel" (click)="cancel()">Annuleren</button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,14 @@
+
+<form [formGroup]="form" (ngSubmit)="createColumn()" class="column-form">
+    <h2>Nieuwe kolom aanmaken</h2>
+  <div class="field">
+    <label for="name">Kolomnaam *</label>
+    <input id="name" type="text" formControlName="name" placeholder="Voer kolomnaam in" />
+  </div>
+
+  <div class="buttons">
+    <button type="submit" class="btn primary">Kolom aanmaken</button>
+    <button type="button" class="btn cancel" (click)="cancel()">Annuleren</button>
+
+  </div>
+</form>

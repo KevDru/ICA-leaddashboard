@@ -1,0 +1,222 @@
+.lead-detail {
+  max-width: 800px;
+  margin: auto;
+    max-height: 680px;
+    overflow-y: auto;
+
+  .collapsible-header {
+    cursor: pointer;
+    user-select: none;
+    padding: 0.5rem 0;
+    margin: 1.5rem 0 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.7;
+    }
+
+    .toggle {
+      display: inline-block;
+      font-size: 0.8rem;
+      min-width: 1rem;
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 500px;
+
+    input,
+    textarea {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      padding: 0.5rem;
+      border: none;
+      background: #393c42;
+      color: white;
+      cursor: pointer;
+      &:hover {
+        opacity: 0.85;
+      }
+    }
+  }
+
+  .notes-section {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    border: 1px solid #eee;
+    background: #fafafa;
+    max-height: 400px;
+    overflow-y: auto;
+
+    .note-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+
+      textarea {
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      button {
+        padding: 0.5rem;
+        border: none;
+        background: #1976d2;
+        color: white;
+        cursor: pointer;
+        &:hover {
+          background: #1565c0;
+        }
+        &:disabled {
+          background: #ccc;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .note-item {
+      padding: 0.75rem;
+      border-left: 3px solid #1976d2;
+      background: white;
+      margin-bottom: 0.5rem;
+      position: relative;
+
+      .note-content {
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+        word-wrap: break-word;
+      }
+
+      .note-meta {
+        font-size: 0.85rem;
+        color: #666;
+        display: flex;
+        gap: 1rem;
+
+        .author {
+          font-weight: 500;
+        }
+
+        .date {
+          color: #999;
+        }
+      }
+
+      .delete-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: #fee2e2;
+        color: #991b1b;
+        border: none;
+        padding: 0.25rem 0.5rem;
+        border-radius: 2px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        &:hover {
+          background: #fecaca;
+        }
+      }
+    }
+
+    .empty {
+      padding: 0.75rem;
+      color: #999;
+      font-style: italic;
+    }
+  }
+
+  .attachments-section {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    border: 1px solid #eee;
+    background: #fafafa;
+    max-height: 400px;
+    overflow-y: auto;
+
+    input[type="file"] {
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .error {
+      color: #c62828;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .attachment-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 0.9rem;
+
+      .name {
+        flex: 1;
+        cursor: pointer;
+        color: #1976d2;
+        text-decoration: underline;
+        &:hover {
+          color: #1565c0;
+        }
+      }
+
+      .uploader {
+        color: #999;
+        font-size: 0.85rem;
+      }
+
+      .delete-btn {
+        background: #fee2e2;
+        color: #991b1b;
+        border: none;
+        padding: 0.25rem 0.5rem;
+        border-radius: 2px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        &:hover {
+          background: #fecaca;
+        }
+      }
+    }
+  }
+
+  > ul {
+    margin: 1.5rem 0 2rem 0;
+  }
+}
+

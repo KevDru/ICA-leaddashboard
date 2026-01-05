@@ -1,0 +1,15 @@
+<div class="auth-container">
+  <h2>Inloggen</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label>E-mailadres</label>
+    <input type="email" formControlName="email" />
+
+    <label>Wachtwoord</label>
+    <input type="password" formControlName="password" />
+
+    <button type="submit">Inloggen</button>
+    @if (error()) {
+    <div class="error">{{ error() }}</div>
+    }
+  </form>
+</div>
