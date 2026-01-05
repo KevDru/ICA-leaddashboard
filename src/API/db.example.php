@@ -1,8 +1,8 @@
 <?php
 $host = "localhost";
-$dbname = "ica_leads";
-$user = "admin_leads";
-$pass = "P9jgN#JSEvKc^^mXHCyK";
+$dbname = "leads-dashboard";
+$user = "root";
+$pass = "";
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
