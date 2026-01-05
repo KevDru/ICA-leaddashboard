@@ -3,12 +3,13 @@
 
 // Sessions
 if (session_status() === PHP_SESSION_NONE) {
-    // Adjust cookie params for local dev; set secure/httponly as needed in production
+    // Allow cross-site cookies for the SPA domain (requires HTTPS)
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
+        'secure' => true,      // send only over HTTPS
         'httponly' => true,
-        'samesite' => 'Lax'
+        'samesite' => 'None'   // allow cross-site requests
     ]);
     session_start();
 }
@@ -19,7 +20,9 @@ function send_cors_headers() {
         'http://localhost:4200',
         'http://127.0.0.1:4200',
         'http://localhost',
-        'http://127.0.0.1'
+        'http://127.0.0.1',
+        'https://leads.imaginecreativeagency.nl',
+        'http://leads.imaginecreativeagency.nl'
     ];
     $isLocalDynamic = false;
     if ($origin) {
