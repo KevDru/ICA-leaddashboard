@@ -1,10 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Attachment } from '../models/attachment';
+import { AppData } from '../../app-data';
 
 @Injectable({ providedIn: 'root' })
 export class AttachmentService {
-  private api = 'http://localhost/ICA-leaddashboard/ICA-leaddashboard/LeadDashboard/src/API/attachments.php';
+  private appData = inject(AppData);
+  private api = this.appData.getBaseAPIURL() + '/attachments.php';
   private http = inject(HttpClient);
   private opts = { withCredentials: true } as const;
 

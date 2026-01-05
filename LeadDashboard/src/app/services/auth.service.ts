@@ -1,11 +1,13 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { AppData } from '../../app-data';
 
 type User = { id: number; email: string; name?: string | null };
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private appData = inject(AppData);
   private http = inject(HttpClient);
   private router = inject(Router);
 
@@ -14,7 +16,7 @@ export class AuthService {
   private bootstrapped = false;
   private bootstrapPromise: Promise<void> | null = null;
 
-  private base = 'http://localhost/ICA-leaddashboard/ICA-leaddashboard/LeadDashboard/src/API';
+  private base = this.appData.getBaseAPIURL();
   private opts = { withCredentials: true } as const;
 
   bootstrap(): Promise<void> {

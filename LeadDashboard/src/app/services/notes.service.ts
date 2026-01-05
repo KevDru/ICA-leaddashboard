@@ -1,10 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Note } from '../models/note';
+import { AppData } from '../../app-data';
 
 @Injectable({ providedIn: 'root' })
 export class NotesService {
-  private api = 'http://localhost/ICA-leaddashboard/ICA-leaddashboard/LeadDashboard/src/API/notes.php';
+  private appData = inject(AppData);
+  private api = this.appData.getBaseAPIURL() + '/notes.php';
   private http = inject(HttpClient);
   private opts = { withCredentials: true } as const;
 
