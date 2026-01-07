@@ -1,33 +1,27 @@
-<div class="kanban-column">
+<div class="kanban-column" [style.--column-color]="column.color || ''">
   <div class="column-header">
-    <h3>{{ column.name }}</h3>
     <div class="column-actions">
-      <button (click)="moveLeft()" class="move-column-btn" title="Kolom naar links">&larr;</button>
-      <button (click)="moveRight()" class="move-column-btn" title="Kolom naar rechts">&rarr;</button>
-      <button (click)="openCreateLeadModal()" class="add-lead-btn">+ Lead toevoegen</button>
+      <div class="move-buttons">
+        <button (click)="moveLeft()" class="move-column-btn" title="Kolom naar links">&larr;</button>
+        <button (click)="moveRight()" class="move-column-btn" title="Kolom naar rechts">&rarr;</button>
+      </div>
+      <button (click)="editColumn()" class="edit-column-btn" title="Kolom bewerken">✎</button>
       <button (click)="deleteColumn()" class="delete-column-btn" title="Kolom verwijderen">×</button>
     </div>
+    <h3>{{ column.name }}</h3>
+    <button (click)="openCreateLeadModal()" class="add-lead-btn">+ Lead toevoegen</button>
   </div>
 
-  <div
-    cdkDropList
-    [cdkDropListData]="leadsSignal()"
-    [cdkDropListConnectedTo]="connectedDropLists"
-    [id]="'drop-list-' + column.id"
-    cdkDropListSortingDisabled
-    class="leads-container"
+  <div cdkDropList [cdkDropListData]="leadsSignal()" [cdkDropListConnectedTo]="connectedDropLists"
+    [id]="'drop-list-' + column.id" cdkDropListSortingDisabled class="leads-container"
     (cdkDropListDropped)="dropEvent.emit($event)">
 
     @for (lead of leadsSignal(); track lead.id) {
-      <app-lead-card
-        [lead]="lead"
-        (refreshLeadEvent)="onRefreshLeads()"
-        (deleteLeadEvent)="onRefreshLeads()"
-        cdkDrag
-        [cdkDragData]="lead">
-      </app-lead-card>
+    <app-lead-card [lead]="lead" (refreshLeadEvent)="onRefreshLeads()" (deleteLeadEvent)="onRefreshLeads()" cdkDrag
+      [cdkDragData]="lead">
+    </app-lead-card>
     }
 
-  
+
   </div>
 </div>

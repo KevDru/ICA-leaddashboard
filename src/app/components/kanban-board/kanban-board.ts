@@ -132,9 +132,9 @@ export class KanbanBoardComponent implements OnInit {
       width: '450px'
     });
 
-    dialogRef.afterClosed().subscribe((columnName: string | null) => {
-      if (columnName) {
-        this.columnsService.create(columnName).subscribe(() => {
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && result.name) {
+        this.columnsService.create({ name: result.name, color: result.color }).subscribe(() => {
           this.loadColumns();
         });
       }

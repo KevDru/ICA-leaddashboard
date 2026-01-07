@@ -20,7 +20,7 @@ $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
-    // Session refers to non-existing user; reset
+    
     $_SESSION = [];
     session_destroy();
     echo json_encode(['authenticated' => false]);
