@@ -1,0 +1,18 @@
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "https://leads.imaginecreativeagency.nl"
+    Header always set Access-Control-Allow-Credentials "true"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+</IfModule>
+
+RewriteEngine On
+
+# Return quickly for CORS preflight without hitting PHP
+RewriteCond %{REQUEST_METHOD} =OPTIONS
+RewriteRule ^ - [R=204,L]
+
+# Protect the DB helper
+<Files "db.php">
+    Order allow,deny
+    Deny from all
+</Files>

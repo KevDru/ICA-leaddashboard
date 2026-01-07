@@ -21,6 +21,7 @@ export class KanbanColumnComponent implements OnChanges {
   @Input() connectedDropLists: string[] = [];
   @Output() dropEvent = new EventEmitter<CdkDragDrop<Lead[]>>();
   @Output() reloadEvent = new EventEmitter<void>();
+  @Output() moveColumnEvent = new EventEmitter<'left' | 'right'>();
 
   leadsSignal = signal<Lead[]>([]);
   private dialog = inject(MatDialog);
@@ -34,6 +35,14 @@ export class KanbanColumnComponent implements OnChanges {
 
   onRefreshLeads() {
     this.reloadEvent.emit();
+  }
+
+  moveLeft() {
+    this.moveColumnEvent.emit('left');
+  }
+
+  moveRight() {
+    this.moveColumnEvent.emit('right');
   }
 
   openCreateLeadModal() {

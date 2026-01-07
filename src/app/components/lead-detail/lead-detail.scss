@@ -1,8 +1,11 @@
 .lead-detail {
   max-width: 800px;
   margin: auto;
-    max-height: 680px;
-    overflow-y: auto;
+  height: 680px;
+  max-height: 680px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 
   .collapsible-header {
     cursor: pointer;
@@ -61,8 +64,13 @@
     padding: 1rem;
     border: 1px solid #eee;
     background: #fafafa;
-    max-height: 400px;
+    max-height: 300px;
+    min-height: 0;
     overflow-y: auto;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 
     .note-form {
       display: flex;
@@ -111,6 +119,7 @@
         margin-bottom: 0.5rem;
         line-height: 1.4;
         word-wrap: break-word;
+        overflow-wrap: anywhere;
       }
 
       .note-meta {
@@ -157,8 +166,10 @@
     padding: 1rem;
     border: 1px solid #eee;
     background: #fafafa;
-    max-height: 400px;
+    max-height: 300px;
+    min-height: 0;
     overflow-y: auto;
+    flex-shrink: 0;
 
     input[type="file"] {
       display: block;

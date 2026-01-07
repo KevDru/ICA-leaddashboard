@@ -34,8 +34,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $file = $_FILES['file'];
     
     if ($file['error'] !== UPLOAD_ERR_OK) {
+        $errorMessages = [
+            UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize in php.ini',
+            UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE in HTML form',
+            UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
+            UPLOAD_ERR_NO_FILE => 'No file was uploaded',
+            UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
+            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+            UPLOAD_ERR_EXTENSION => 'File upload stopped by extension',
+        ];
+        $message = $errorMessages[$file['error']] ?? 'Unknown upload error: ' . $file['error'];
         http_response_code(400);
-        echo json_encode(['error' => 'File upload failed']);
+        echo json_encode(['error' => $message]);
         exit;
     }
 

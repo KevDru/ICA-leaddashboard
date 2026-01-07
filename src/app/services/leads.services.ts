@@ -11,7 +11,8 @@ export class LeadsService {
   private opts = { withCredentials: true } as const;
 
   getByColumn(columnId: number) {
-    return this.http.get<Lead[]>(`${this.api}?column_id=${columnId}`, this.opts);
+    // Use cid to avoid WAF false positive on "column_id" in the URL
+    return this.http.get<Lead[]>(`${this.api}?cid=${columnId}`, this.opts);
   }
 
   getById(id: number) {

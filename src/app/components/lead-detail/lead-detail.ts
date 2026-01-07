@@ -10,6 +10,7 @@ import { Lead } from '../../models/lead';
 import { LeadHistory } from '../../models/history';
 import { Attachment } from '../../models/attachment';
 import { Note } from '../../models/note';
+import { AppData } from '../../../app-data';
 
 @Component({
   selector: 'app-lead-detail',
@@ -37,6 +38,7 @@ export class LeadDetailComponent implements OnInit {
   private historyService = inject(HistoryService);
   private attachmentService = inject(AttachmentService);
   private notesService = inject(NotesService);
+  private appData = inject(AppData);
 
   constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -66,7 +68,8 @@ export class LeadDetailComponent implements OnInit {
       this.form = new FormGroup({
         title: new FormControl(l.title, [Validators.required, Validators.minLength(1)]),
         customer: new FormControl(l.customer),
-        description: new FormControl(l.description)
+        description: new FormControl(l.description),
+        created_at: new FormControl(this.toDateTimeLocal(l.created_at))
       });
       this.loadHistory(id);
       this.loadAttachments(id);
@@ -129,7 +132,9 @@ export class LeadDetailComponent implements OnInit {
   }
 
   downloadAttachment(attachment: Attachment) {
-    const url = `/ICA-leaddashboard/ICA-leaddashboard/LeadDashboard/src/uploads/${attachment.file_path}`;
+    // Serve from deployed uploads folder next to /api
+    const base = this.appData.getBaseAPIURL().replace(/\/api$/, '');
+    const url = `${base}/uploads/${attachment.file_path}`;
     const link = document.createElement('a');
     link.href = url;
     link.download = attachment.file_name;
@@ -142,7 +147,12 @@ export class LeadDetailComponent implements OnInit {
       return;
     }
 
-    this.leadsService.update(this.lead()!.id, this.form.value)
+    const payload = {
+      ...this.form.value,
+      created_at: this.toSqlDateTime(this.form.value.created_at as string | null)
+    };
+
+    this.leadsService.update(this.lead()!.id, payload)
       .subscribe({
         next: () => {
           if (this.dialogRef) this.dialogRef.close(true);
@@ -159,6 +169,17 @@ export class LeadDetailComponent implements OnInit {
     this.leadsService.delete(this.lead()!.id).subscribe(() => {
       if (this.dialogRef) this.dialogRef.close(true);
     });
+  }
+
+  private toDateTimeLocal(value?: string | null): string | null {
+    if (!value) return null;
+    // Expecting value like "YYYY-MM-DD HH:mm:ss"; convert to datetime-local format
+    return value.replace(' ', 'T').slice(0, 16);
+  }
+
+  private toSqlDateTime(value: string | null): string | undefined {
+    if (!value) return undefined;
+    return `${value.replace('T', ' ')}:00`;
   }
 }
 

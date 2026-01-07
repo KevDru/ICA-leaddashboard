@@ -18,25 +18,35 @@
       flex: 1;
     }
 
-    button {
-      padding: 0.25rem 0.5rem;
-      border: none;
-      background: #e5e7eb;
-      cursor: pointer;
-      border-radius: 0.25rem;
-      font-size: 0.9rem;
+    .column-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
 
-      &:hover {
-        background: #d1d5db;
-      }
-
-      &.delete-column-btn {
-        background: #fee2e2;
-        color: #991b1b;
-        font-weight: bold;
+      button {
+        padding: 0.25rem 0.5rem;
+        border: none;
+        background: #e5e7eb;
+        cursor: pointer;
+        border-radius: 0.25rem;
+        font-size: 0.9rem;
 
         &:hover {
-          background: #fecaca;
+          background: #d1d5db;
+        }
+
+        &.move-column-btn {
+          width: 32px;
+        }
+
+        &.delete-column-btn {
+          background: #fee2e2;
+          color: #991b1b;
+          font-weight: bold;
+
+          &:hover {
+            background: #fecaca;
+          }
         }
       }
     }

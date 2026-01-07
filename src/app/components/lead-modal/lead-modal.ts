@@ -17,7 +17,8 @@ export class LeadModalComponent {
   form = new FormGroup({
     title: new FormControl(''),
     customer: new FormControl(''),
-    description: new FormControl('')
+    description: new FormControl(''),
+    created_at: new FormControl(this.defaultCreatedAt())
   });
 
   columnId: number;
@@ -39,7 +40,8 @@ export class LeadModalComponent {
       column_id: this.columnId,
       title,
       customer: this.form.value.customer ?? '',
-      description: this.form.value.description ?? ''
+      description: this.form.value.description ?? '',
+      created_at: this.toSqlDateTime(this.form.value.created_at)
     };
 
     this.leadsService.create(payload).subscribe(() => {
@@ -50,5 +52,17 @@ export class LeadModalComponent {
 
   cancel() {
     this.dialogRef.close(false);
+  }
+
+  private defaultCreatedAt(): string {
+    // Match datetime-local input format (YYYY-MM-DDTHH:mm)
+    return new Date().toISOString().slice(0, 16);
+  }
+
+  private toSqlDateTime(value: unknown): string | undefined {
+    if (!value || typeof value !== 'string') return undefined;
+    // Convert from datetime-local (YYYY-MM-DDTHH:mm) to SQL friendly (YYYY-MM-DD HH:mm:00)
+    const datePart = value.replace('T', ' ');
+    return `${datePart}:00`;
   }
 }
