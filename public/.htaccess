@@ -1,0 +1,18 @@
+RewriteEngine On
+
+# If the directory or file exists, pass it through
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Do not lead API requests to the Angular SPA
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^ - [L]
+
+# Everything else --> index.html (Angular SPA)
+RewriteRule ^ index.html [L]
+
+<Files "db.php">
+    Order allow,deny
+    Deny from all
+</Files>

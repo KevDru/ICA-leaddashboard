@@ -7,7 +7,8 @@
           [leads]="leadsMap().get(column.id) || []"
           [connectedDropLists]="connectedDropLists()"
           (dropEvent)="drop($event, column.id)"
-          (reloadEvent)="loadColumns()">
+          (reloadEvent)="loadColumns()"
+          (moveColumnEvent)="moveColumn(column, $event)">
         </app-kanban-column>
       }
       @empty {

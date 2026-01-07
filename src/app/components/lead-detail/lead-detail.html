@@ -9,6 +9,8 @@
     <input formControlName="customer"/>
     <label>Beschrijving</label>
     <textarea formControlName="description"></textarea>
+    <label>Aangemaakt op</label>
+    <input type="datetime-local" formControlName="created_at" />
     <button type="submit" [disabled]="!form.valid">Opslaan</button>
     <button type="button" class="delete-btn" (click)="delete()">Lead verwijderen</button>
   </form>

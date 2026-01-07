@@ -18,6 +18,11 @@
       <textarea id="description" formControlName="description" placeholder="Optionele beschrijving"></textarea>
     </div>
 
+    <div class="field">
+      <label for="created_at">Aangemaakt op</label>
+      <input id="created_at" type="datetime-local" formControlName="created_at" />
+    </div>
+
     <div class="buttons">
       <button type="submit" class="primary">Lead aanmaken</button>
       <button type="button" class="cancel" (click)="cancel()">Annuleren</button>

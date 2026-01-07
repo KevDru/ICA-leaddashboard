@@ -22,7 +22,9 @@ if ($method === "GET") {
     }
 
     // Get all leads in a column
-    if (isset($_GET["column_id"])) {
+    // Accept "cid" to avoid WAF false-positives on the literal "column_id" in the URI
+    $columnId = $_GET["cid"] ?? $_GET["column_id"] ?? null;
+    if ($columnId !== null) {
         $stmt = $pdo->prepare("
             SELECT l.*, u.name as creator_name 
             FROM leads l 
@@ -30,7 +32,7 @@ if ($method === "GET") {
             WHERE l.column_id = ? 
             ORDER BY l.id DESC
         ");
-        $stmt->execute([$_GET["column_id"]]);
+        $stmt->execute([$columnId]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
     }
@@ -42,16 +44,19 @@ if ($method === "GET") {
 if ($method === "POST") {
     $data = json_decode(file_get_contents("php://input"), true);
 
+    $createdAt = isset($data["created_at"]) && !empty($data["created_at"]) ? $data["created_at"] : date('Y-m-d H:i:s');
+
     $stmt = $pdo->prepare("
-        INSERT INTO leads (title, customer, description, column_id, created_by)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO leads (title, customer, description, column_id, created_by, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
     $stmt->execute([
         $data["title"],
         $data["customer"],
         $data["description"] ?? null,
         $data["column_id"],
-        $_SESSION['user_id'] ?? null
+        $_SESSION['user_id'] ?? null,
+        $createdAt
     ]);
 
     $id = $pdo->lastInsertId();
@@ -97,8 +102,8 @@ if ($method === "PUT") {
         exit;
     }
 
-    $stmt = $pdo->prepare("UPDATE leads SET title=?, customer=?, description=? WHERE id=?");
-    $stmt->execute([$data["title"], $data["customer"], $data["description"], $id]);
+    $stmt = $pdo->prepare("UPDATE leads SET title=?, customer=?, description=?, created_at = COALESCE(NULLIF(?, ''), created_at) WHERE id=?");
+    $stmt->execute([$data["title"], $data["customer"], $data["description"], $data["created_at"] ?? null, $id]);
 
     $pdo->prepare("INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, 'Lead bijgewerkt', ?)")
         ->execute([$id, $_SESSION['user_id']??null]);

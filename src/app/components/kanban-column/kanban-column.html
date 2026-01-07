@@ -1,8 +1,12 @@
 <div class="kanban-column">
   <div class="column-header">
     <h3>{{ column.name }}</h3>
-    <button (click)="openCreateLeadModal()" class="add-lead-btn">+ Lead toevoegen</button>
-    <button (click)="deleteColumn()" class="delete-column-btn" title="Kolom verwijderen">×</button>
+    <div class="column-actions">
+      <button (click)="moveLeft()" class="move-column-btn" title="Kolom naar links">&larr;</button>
+      <button (click)="moveRight()" class="move-column-btn" title="Kolom naar rechts">&rarr;</button>
+      <button (click)="openCreateLeadModal()" class="add-lead-btn">+ Lead toevoegen</button>
+      <button (click)="deleteColumn()" class="delete-column-btn" title="Kolom verwijderen">×</button>
+    </div>
   </div>
 
   <div
