@@ -1,6 +1,4 @@
 .kanban-column {
-  /* top border uses the column color when provided via --column-color */
-  border-top: 6px solid var(--column-color, transparent);
   background: #f3f4f6;
   padding: 1rem;
   border-radius: 0.5rem;
@@ -23,7 +21,8 @@
     h3 {
       margin: 0;
       flex: 1;
-      align-items: center;
+      width: 100%;
+      text-align: center; /* center the column title */
     }
     .column-actions {
       display: flex;
@@ -55,20 +54,6 @@
 
         &:hover {
           background: #fecaca;
-        }
-      }
-
-      .edit-column-btn {
-        padding: 0.25rem 0.5rem;
-        border: none;
-        background: #e5e7eb;
-        cursor: pointer;
-        border-radius: 0.25rem;
-        font-size: 0.95rem;
-        margin-left: 0.25rem;
-
-        &:hover {
-          background: #d1d5db;
         }
       }
     }

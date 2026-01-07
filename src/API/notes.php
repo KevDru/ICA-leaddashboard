@@ -69,6 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $row = $u->fetch(PDO::FETCH_ASSOC);
         if ($row && isset($row['name'])) $authorName = $row['name'];
     }
+    // Add history entry for the new note (attempt before responding so frontend refresh sees it)
+    try {
+        $action = 'Notitie toegevoegd:note_id=' . $newId;
+        $hstmt = $pdo->prepare('INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, ?, ?)');
+        $hstmt->execute([$lead_id, $action, $_SESSION['user_id'] ?? null]);
+    } catch (Throwable $e) {
+        // ignore history insertion errors
+    }
 
     echo json_encode([
         'success' => true,

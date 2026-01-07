@@ -11,8 +11,7 @@ export class ColumnsService {
   private opts = { withCredentials: true } as const;
 
   getAll() { return this.http.get<Column[]>(this.api, this.opts); }
-  // Allow sending name and optional color when creating a column
-  create(data: { name: string; color?: string }) { return this.http.post(this.api, data, this.opts); }
+  create(name: string) { return this.http.post(this.api, { name }, this.opts); }
   update(id: number, data: Partial<Column>) { return this.http.put(`${this.api}?id=${id}`, data, this.opts); }
   delete(id: number) { return this.http.delete(`${this.api}?id=${id}`, this.opts); }
 }

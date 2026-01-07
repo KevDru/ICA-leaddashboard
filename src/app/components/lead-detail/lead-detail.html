@@ -7,6 +7,12 @@
     <input formControlName="title"/>
     <label>Klant</label>
     <input formControlName="customer"/>
+    <label>Contactpersoon</label>
+    <input formControlName="contact_name" />
+    <label>Email contact</label>
+    <input formControlName="contact_email" />
+    <label>Telefoon contact</label>
+    <input formControlName="contact_phone" />
     <label>Beschrijving</label>
     <textarea formControlName="description"></textarea>
     <label>Aangemaakt op</label>
@@ -14,6 +20,7 @@
     <button type="submit" [disabled]="!form.valid">Opslaan</button>
     <button type="button" class="delete-btn" (click)="delete()">Lead verwijderen</button>
   </form>
+  
 
   <h3 (click)="toggleNotes()" class="collapsible-header">
     <span class="toggle">{{ notesExpanded() ? '▼' : '▶' }}</span>
@@ -21,13 +28,14 @@
   </h3>
   @if (notesExpanded()) {
     <div class="notes-section">
-      <form [formGroup]="noteForm" (ngSubmit)="addNote()" class="note-form">
-        <textarea formControlName="content" placeholder="Voeg een notitie toe..."></textarea>
-        <button type="submit" [disabled]="!noteForm.valid">Notitie toevoegen</button>
+      <form [formGroup]="noteForm" class="note-form">
+        <textarea formControlName="content" placeholder="Voeg een notitie toe..." (keydown)="onNoteTextareaKeydown($event)"></textarea>
+  <button type="button" (click)="addNote()" [disabled]="!noteForm.valid">Notitie toevoegen</button>
+
       </form>
       <ul>
         @for (n of notes(); track n.id) {
-          <li class="note-item">
+          <li class="note-item" id="note-{{ n.id }}" attr.data-note-id="{{ n.id }}">
             <div class="note-content">{{ n.content }}</div>
             <div class="note-meta">
               @if (n.author_name) {
@@ -57,7 +65,7 @@
       }
       <ul>
         @for (a of attachments(); track a.id) {
-          <li class="attachment-item">
+          <li class="attachment-item" id="attachment-{{ a.id }}" attr.data-attachment-id="{{ a.id }}">
             <span class="name" (click)="downloadAttachment(a)">📄 {{ a.file_name }}</span>
             @if (a.uploader_name) {
               <span class="uploader">door {{ a.uploader_name }}</span>
@@ -77,10 +85,10 @@
     Geschiedenis
   </h3>
   @if (historyExpanded()) {
-    <ul>
+    <ul class="history-list">
       @for (h of history(); track h.id) {
-        <li>
-          {{ h.action }}
+        <li class="history-item" (click)="onHistoryClick(h)" [class.clickable]="isHistoryClickable(h)" [attr.title]="isHistoryClickable(h) ? 'Klik om item te openen' : null">
+          <div class="action">{{ h.action }}</div>
           @if (h.user_name) { <span class="user">door {{ h.user_name }}</span> }
           <span class="time"> op {{ h.created_at }}</span>
         </li>

@@ -1,11 +1,10 @@
-<div class="kanban-column" [style.--column-color]="column.color || ''">
+<div class="kanban-column">
   <div class="column-header">
     <div class="column-actions">
       <div class="move-buttons">
         <button (click)="moveLeft()" class="move-column-btn" title="Kolom naar links">&larr;</button>
         <button (click)="moveRight()" class="move-column-btn" title="Kolom naar rechts">&rarr;</button>
       </div>
-      <button (click)="editColumn()" class="edit-column-btn" title="Kolom bewerken">✎</button>
       <button (click)="deleteColumn()" class="delete-column-btn" title="Kolom verwijderen">×</button>
     </div>
     <h3>{{ column.name }}</h3>

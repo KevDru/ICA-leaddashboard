@@ -87,10 +87,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id'] ?? null
     ]);
 
+    $newId = (int)$pdo->lastInsertId();
+
+    // Insert history entry for the attachment (non-fatal on error)
+    try {
+        $action = 'Bijlage toegevoegd:attachment_id=' . $newId;
+        $hstmt = $pdo->prepare('INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, ?, ?)');
+        $hstmt->execute([$lead_id, $action, $_SESSION['user_id'] ?? null]);
+    } catch (Throwable $e) {
+        // ignore history insertion errors
+    }
+
     echo json_encode([
         'success' => true,
         'attachment' => [
-            'id' => (int)$pdo->lastInsertId(),
+            'id' => $newId,
             'lead_id' => $lead_id,
             'file_name' => $file['name'],
             'file_path' => $filename,

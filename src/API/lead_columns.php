@@ -39,11 +39,11 @@ if ($method === "POST") {
     $posStmt = $pdo->query("SELECT COALESCE(MAX(position), 0) + 1 AS next_pos FROM lead_columns");
     $nextPos = $posStmt->fetchColumn();
 
-    // allow optional color (nullable)
-    $color = isset($data['color']) ? $data['color'] : null;
-
-    $stmt = $pdo->prepare("INSERT INTO lead_columns (name, position, color) VALUES (?, ?, ?)");
-    $stmt->execute([$data["name"], $nextPos, $color]);
+    $stmt = $pdo->prepare("
+    INSERT INTO lead_columns (name, position)
+    VALUES (?, ?)
+");
+    $stmt->execute([$data["name"], $nextPos]);
 
     echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
     exit;
@@ -59,16 +59,8 @@ if ($method === "PUT") {
     $id = $_GET["id"];
     $data = json_decode(file_get_contents("php://input"), true);
 
-    // Allow updating name, position and optional color. Keep previous value if not provided.
-    $existing = $pdo->prepare("SELECT color FROM lead_columns WHERE id = ?");
-    $existing->execute([$id]);
-    $current = $existing->fetch(PDO::FETCH_ASSOC);
-    $currentColor = $current['color'] ?? null;
-
-    $color = array_key_exists('color', $data) ? $data['color'] : $currentColor;
-
-    $stmt = $pdo->prepare("UPDATE lead_columns SET name = ?, position = ?, color = ? WHERE id = ?");
-    $stmt->execute([$data["name"], $data["position"], $color, $id]);
+    $stmt = $pdo->prepare("UPDATE lead_columns SET name = ?, position = ? WHERE id = ?");
+    $stmt->execute([$data["name"], $data["position"], $id]);
 
     echo json_encode(["success" => true]);
     exit;

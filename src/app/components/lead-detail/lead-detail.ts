@@ -34,15 +34,15 @@ export class LeadDetailComponent implements OnInit {
   attachmentsExpanded = signal(false);
   historyExpanded = signal(false);
 
-  private leadsService = inject(LeadsService);
-  private historyService = inject(HistoryService);
-  private attachmentService = inject(AttachmentService);
-  private notesService = inject(NotesService);
-  private appData = inject(AppData);
+  private readonly leadsService = inject(LeadsService);
+  private readonly historyService = inject(HistoryService);
+  private readonly attachmentService = inject(AttachmentService);
+  private readonly notesService = inject(NotesService);
+  private readonly appData = inject(AppData);
 
   constructor(
-    @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: any,
-    @Optional() private dialogRef: MatDialogRef<LeadDetailComponent>
+    @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: { id?: number } | null,
+    @Optional() private dialogRef: MatDialogRef<LeadDetailComponent> | null
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +68,9 @@ export class LeadDetailComponent implements OnInit {
       this.form = new FormGroup({
         title: new FormControl(l.title, [Validators.required, Validators.minLength(1)]),
         customer: new FormControl(l.customer),
+        contact_name: new FormControl((l as any).contact_name ?? ''),
+        contact_email: new FormControl((l as any).contact_email ?? '', [Validators.email]),
+        contact_phone: new FormControl((l as any).contact_phone ?? ''),
         description: new FormControl(l.description),
         created_at: new FormControl(this.toDateTimeLocal(l.created_at))
       });
@@ -75,6 +78,24 @@ export class LeadDetailComponent implements OnInit {
       this.loadAttachments(id);
       this.loadNotes(id);
     });
+  }
+
+  /**
+   * Add a small optimistic history entry and then refresh from server.
+   * Keeps the duplicate logic from addNote/onFileSelected in one place.
+   */
+  private addOptimisticHistory(action: string, userName: string | null) {
+    if (!this.lead()) return;
+    const fakeHistory: any = {
+      id: null,
+      lead_id: this.lead()!.id,
+      action,
+      user_name: userName ?? null,
+      created_at: new Date().toISOString().slice(0, 19).replace('T', ' ')
+    };
+    this.history.set([fakeHistory, ...this.history()]);
+    this.historyExpanded.set(true);
+    this.loadHistory(this.lead()!.id);
   }
 
   loadHistory(id: number) {
@@ -98,9 +119,30 @@ export class LeadDetailComponent implements OnInit {
       next: (res) => {
         this.notes.set([res.note, ...this.notes()]);
         this.noteForm.reset();
+        // Optimistic history + refresh (moved to helper)
+        this.addOptimisticHistory(`Notitie toegevoegd:note_id=${res.note.id}`, res.note.author_name ?? null);
       },
-      error: (err) => alert(err?.error?.error ?? 'Failed to add note')
+      error: (err) => this.showError(err, 'Failed to add note')
     });
+  }
+
+  onNoteTextareaKeydown(event: KeyboardEvent) {
+    const target = event.target as HTMLTextAreaElement | null;
+    if (!target) return;
+    // Plain Enter -> insert newline at cursor position (prevent any accidental submit)
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const ctrl = this.noteForm.get('content');
+      const value = ctrl?.value ?? '';
+      const start = target.selectionStart ?? value.length;
+      const end = target.selectionEnd ?? value.length;
+      const newValue = value.slice(0, start) + '\n' + value.slice(end);
+      ctrl?.setValue(newValue);
+      // move caret after inserted newline
+      setTimeout(() => {
+        try { target.selectionStart = target.selectionEnd = start + 1; } catch (e) {}
+      }, 0);
+    }
   }
 
   deleteNote(id: number) {
@@ -119,6 +161,8 @@ export class LeadDetailComponent implements OnInit {
       next: (res) => {
         this.attachments.set([res.attachment, ...this.attachments()]);
         (event.target as HTMLInputElement).value = '';
+        // Optimistic history + refresh (moved to helper)
+        this.addOptimisticHistory(`Bijlage toegevoegd:attachment_id=${res.attachment.id}`, res.attachment.uploader_name ?? null);
       },
       error: (err) => this.uploadError.set(err?.error?.error ?? 'Upload failed')
     });
@@ -158,9 +202,68 @@ export class LeadDetailComponent implements OnInit {
           if (this.dialogRef) this.dialogRef.close(true);
         },
         error: (err) => {
-          alert(err.error?.error || 'Failed to save lead');
+            this.showError(err, 'Failed to save lead');
         }
       });
+  }
+
+    private showError(err: any, fallback?: string) {
+      const msg = err?.error?.error ?? fallback ?? 'An error occurred';
+      // Keep the simple UX the original code had but centralize logging
+      alert(msg);
+      console.error(err);
+    }
+
+  onHistoryClick(h: any) {
+    // Try to detect note or attachment references in the action text
+    const action = (h.action || '').toString();
+
+    const noteMatch = action.match(/note_id[=:](\d+)/i);
+    if (noteMatch) {
+      const noteId = Number(noteMatch[1]);
+      this.notesExpanded.set(true);
+      // ensure notes are loaded
+      if (!this.notes().length && this.lead()) this.loadNotes(this.lead()!.id);
+      // wait a tick for DOM to render
+      setTimeout(() => {
+        const el = document.getElementById('note-' + noteId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('highlight');
+          setTimeout(() => el.classList.remove('highlight'), 2200);
+        }
+      }, 200);
+      return;
+    }
+
+    const attMatch = action.match(/attachment_id[=:](\d+)/i);
+    if (attMatch) {
+      const attId = Number(attMatch[1]);
+      this.attachmentsExpanded.set(true);
+      if (!this.attachments().length && this.lead()) this.loadAttachments(this.lead()!.id);
+      setTimeout(() => {
+        const el = document.querySelector(`[data-attachment-id="${attId}"]`);
+        if (el && typeof (el as HTMLElement).scrollIntoView === 'function') {
+          (el as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('highlight');
+          setTimeout(() => el.classList.remove('highlight'), 2200);
+        }
+      }, 200);
+      return;
+    }
+
+    // Fallback: do nothing
+  }
+
+  /**
+   * Return true when the history action references a note or attachment so
+   * the template can render a hover/click affordance.
+   */
+  isHistoryClickable(h: any): boolean {
+    const action = (h?.action || '').toString();
+    const noteMatch = /note_id[=:](\d+)/i.test(action);
+    const attMatch = /attachment_id[=:](\d+)/i.test(action);
+    return Boolean(noteMatch || attMatch);
   }
 
   delete() {

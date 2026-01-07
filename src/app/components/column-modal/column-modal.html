@@ -1,18 +1,13 @@
 
 <form [formGroup]="form" (ngSubmit)="createColumn()" class="column-form">
-    <h2>{{ data && data.name ? 'Kolom bewerken' : 'Nieuwe kolom aanmaken' }}</h2>
+    <h2>Nieuwe kolom aanmaken</h2>
   <div class="field">
     <label for="name">Kolomnaam *</label>
     <input id="name" type="text" formControlName="name" placeholder="Voer kolomnaam in" />
   </div>
 
-  <div class="field">
-    <label for="color">Kleur (accent)</label>
-    <input id="color" type="color" formControlName="color" />
-  </div>
-
   <div class="buttons">
-    <button type="submit" class="btn primary">{{ data && data.name ? 'Opslaan' : 'Kolom aanmaken' }}</button>
+    <button type="submit" class="btn primary">Kolom aanmaken</button>
     <button type="button" class="btn cancel" (click)="cancel()">Annuleren</button>
 
   </div>

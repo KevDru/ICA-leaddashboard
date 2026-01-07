@@ -46,13 +46,21 @@ if ($method === "POST") {
 
     $createdAt = isset($data["created_at"]) && !empty($data["created_at"]) ? $data["created_at"] : date('Y-m-d H:i:s');
 
+    // Optional contact fields
+    $contactName = $data["contact_name"] ?? null;
+    $contactEmail = $data["contact_email"] ?? null;
+    $contactPhone = $data["contact_phone"] ?? null;
+
     $stmt = $pdo->prepare("
-        INSERT INTO leads (title, customer, description, column_id, created_by, created_at)
-        VALUES (?, ?, ?, ?, ?, ?)
+           INSERT INTO leads (title, customer, contact_name, contact_email, contact_phone, description, column_id, created_by, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
     $stmt->execute([
         $data["title"],
         $data["customer"],
+           $contactName,
+           $contactEmail,
+           $contactPhone,
         $data["description"] ?? null,
         $data["column_id"],
         $_SESSION['user_id'] ?? null,
@@ -102,13 +110,21 @@ if ($method === "PUT") {
         exit;
     }
 
-    $stmt = $pdo->prepare("UPDATE leads SET title=?, customer=?, description=?, created_at = COALESCE(NULLIF(?, ''), created_at) WHERE id=?");
-    $stmt->execute([$data["title"], $data["customer"], $data["description"], $data["created_at"] ?? null, $id]);
+    // Optional contact fields: update if present (DB must have these columns)
+    $contactName = isset($data["contact_name"]) ? $data["contact_name"] : null;
+    $contactEmail = isset($data["contact_email"]) ? $data["contact_email"] : null;
+    $contactPhone = isset($data["contact_phone"]) ? $data["contact_phone"] : null;
+
+    $stmt = $pdo->prepare("UPDATE leads SET title=?, customer=?, contact_name=?, contact_email=?, contact_phone=?, description=?, created_at = COALESCE(NULLIF(?, ''), created_at) WHERE id=?");
+    $stmt->execute([$data["title"], $data["customer"], $contactName, $contactEmail, $contactPhone, $data["description"], $data["created_at"] ?? null, $id]);
+
+    // diagnostic: report how many rows were affected to help debug when updates seem to not persist
+    $affected = $stmt->rowCount();
 
     $pdo->prepare("INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, 'Lead bijgewerkt', ?)")
         ->execute([$id, $_SESSION['user_id']??null]);
 
-    echo json_encode(["success" => true]);
+    echo json_encode(["success" => true, "affected_rows" => $affected]);
 }
 
 if ($method === "DELETE") {
