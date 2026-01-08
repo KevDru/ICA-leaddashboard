@@ -32,7 +32,10 @@ export class LeadCardComponent {
 
   openDetailModal() {
     const dialogRef = this.dialog.open(LeadDetailComponent, {
-      width: '800px',
+      width: '1200px',
+      height: '90vh',
+      maxWidth: '98vw',
+      maxHeight: '95vh',
       data: { id: this.lead.id }
     });
 

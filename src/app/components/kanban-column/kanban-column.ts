@@ -47,7 +47,8 @@ export class KanbanColumnComponent implements OnChanges {
 
   openCreateLeadModal() {
     const dialogRef = this.dialog.open(LeadModalComponent, {
-      width: '500px',
+      width: '800px',
+      maxWidth: '90vw',
       data: { columnId: this.column.id }
     });
 
