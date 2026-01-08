@@ -80,10 +80,7 @@ export class LeadDetailComponent implements OnInit {
     });
   }
 
-  /**
-   * Add a small optimistic history entry and then refresh from server.
-   * Keeps the duplicate logic from addNote/onFileSelected in one place.
-   */
+  // Add a temporary history entry before refreshing from the server
   private addOptimisticHistory(action: string, userName: string | null) {
     if (!this.lead()) return;
     const fakeHistory: any = {
@@ -119,7 +116,7 @@ export class LeadDetailComponent implements OnInit {
       next: (res) => {
         this.notes.set([res.note, ...this.notes()]);
         this.noteForm.reset();
-        // Optimistic history + refresh (moved to helper)
+        // Add the history entry before the refresh
         this.addOptimisticHistory(`Notitie toegevoegd:note_id=${res.note.id}`, res.note.author_name ?? null);
       },
       error: (err) => this.showError(err, 'Failed to add note')
@@ -129,7 +126,7 @@ export class LeadDetailComponent implements OnInit {
   onNoteTextareaKeydown(event: KeyboardEvent) {
     const target = event.target as HTMLTextAreaElement | null;
     if (!target) return;
-    // Plain Enter -> insert newline at cursor position (prevent any accidental submit)
+    // Treat Enter as newline instead of submitting
     if (event.key === 'Enter') {
       event.preventDefault();
       const ctrl = this.noteForm.get('content');
@@ -138,7 +135,7 @@ export class LeadDetailComponent implements OnInit {
       const end = target.selectionEnd ?? value.length;
       const newValue = value.slice(0, start) + '\n' + value.slice(end);
       ctrl?.setValue(newValue);
-      // move caret after inserted newline
+      // Move caret to just after the inserted newline
       setTimeout(() => {
         try { target.selectionStart = target.selectionEnd = start + 1; } catch (e) {}
       }, 0);
@@ -161,7 +158,7 @@ export class LeadDetailComponent implements OnInit {
       next: (res) => {
         this.attachments.set([res.attachment, ...this.attachments()]);
         (event.target as HTMLInputElement).value = '';
-        // Optimistic history + refresh (moved to helper)
+        // Add the history entry before the refresh
         this.addOptimisticHistory(`Bijlage toegevoegd:attachment_id=${res.attachment.id}`, res.attachment.uploader_name ?? null);
       },
       error: (err) => this.uploadError.set(err?.error?.error ?? 'Upload failed')
@@ -176,7 +173,7 @@ export class LeadDetailComponent implements OnInit {
   }
 
   downloadAttachment(attachment: Attachment) {
-    // Serve from deployed uploads folder next to /api
+    // Serve from the deployed uploads folder next to /api
     const base = this.appData.getBaseAPIURL().replace(/\/api$/, '');
     const url = `${base}/uploads/${attachment.file_path}`;
     const link = document.createElement('a');
@@ -209,22 +206,22 @@ export class LeadDetailComponent implements OnInit {
 
     private showError(err: any, fallback?: string) {
       const msg = err?.error?.error ?? fallback ?? 'An error occurred';
-      // Keep the simple UX the original code had but centralize logging
+      // Preserve the simple alert UX while still logging errors
       alert(msg);
       console.error(err);
     }
 
   onHistoryClick(h: any) {
-    // Try to detect note or attachment references in the action text
+    // Scroll to linked notes or attachments when the action text contains an id
     const action = (h.action || '').toString();
 
     const noteMatch = action.match(/note_id[=:](\d+)/i);
     if (noteMatch) {
       const noteId = Number(noteMatch[1]);
       this.notesExpanded.set(true);
-      // ensure notes are loaded
+      // Load notes if needed before scrolling
       if (!this.notes().length && this.lead()) this.loadNotes(this.lead()!.id);
-      // wait a tick for DOM to render
+      // Wait briefly so the DOM is ready for scrolling
       setTimeout(() => {
         const el = document.getElementById('note-' + noteId);
         if (el) {
@@ -251,14 +248,9 @@ export class LeadDetailComponent implements OnInit {
       }, 200);
       return;
     }
-
-    // Fallback: do nothing
   }
 
-  /**
-   * Return true when the history action references a note or attachment so
-   * the template can render a hover/click affordance.
-   */
+  // Indicate when the history entry references a note or attachment
   isHistoryClickable(h: any): boolean {
     const action = (h?.action || '').toString();
     const noteMatch = /note_id[=:](\d+)/i.test(action);
@@ -276,7 +268,7 @@ export class LeadDetailComponent implements OnInit {
 
   private toDateTimeLocal(value?: string | null): string | null {
     if (!value) return null;
-    // Expecting value like "YYYY-MM-DD HH:mm:ss"; convert to datetime-local format
+    // Convert SQL datetime (YYYY-MM-DD HH:mm:ss) to datetime-local
     return value.replace(' ', 'T').slice(0, 16);
   }
 

@@ -4,11 +4,10 @@ require_once __DIR__ . '/db.php';
 
 $method = $_SERVER["REQUEST_METHOD"];
 
-// Require auth for all methods except OPTIONS
+// All endpoints require an authenticated session
 ensure_authenticated();
 
 if ($method === "GET") {
-    // Get single lead by ID
     if (isset($_GET["id"])) {
         $stmt = $pdo->prepare("
             SELECT l.*, u.name as creator_name 
@@ -21,8 +20,7 @@ if ($method === "GET") {
         exit;
     }
 
-    // Get all leads in a column
-    // Accept "cid" to avoid WAF false-positives on the literal "column_id" in the URI
+    // Accept "cid" alias to avoid WAF false-positives on "column_id"
     $columnId = $_GET["cid"] ?? $_GET["column_id"] ?? null;
     if ($columnId !== null) {
         $stmt = $pdo->prepare("
@@ -69,7 +67,7 @@ if ($method === "POST") {
 
     $id = $pdo->lastInsertId();
 
-    // history
+    // Record creation in history
     $pdo->prepare("INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, 'Lead aangemaakt', ?)")
         ->execute([$id, $_SESSION['user_id']??null]);
 
@@ -86,7 +84,7 @@ if ($method === "PUT") {
         $stmt = $pdo->prepare("UPDATE leads SET column_id = ? WHERE id = ?");
         $stmt->execute([$data["column_id"], $id]);
 
-        // Get the column name for history
+        // Include column name in the history entry
         $colStmt = $pdo->prepare("SELECT name FROM lead_columns WHERE id = ?");
         $colStmt->execute([$data["column_id"]]);
         $column = $colStmt->fetch(PDO::FETCH_ASSOC);
@@ -103,14 +101,14 @@ if ($method === "PUT") {
 
     $data = json_decode(file_get_contents("php://input"), true);
 
-    // Validate title is not empty
+    // Reject updates with a blank title
     if (!isset($data["title"]) || empty(trim($data["title"]))) {
         http_response_code(400);
         echo json_encode(["error" => "Title is required"]);
         exit;
     }
 
-    // Optional contact fields: update if present (DB must have these columns)
+    // Apply contact fields when provided
     $contactName = isset($data["contact_name"]) ? $data["contact_name"] : null;
     $contactEmail = isset($data["contact_email"]) ? $data["contact_email"] : null;
     $contactPhone = isset($data["contact_phone"]) ? $data["contact_phone"] : null;
@@ -118,7 +116,7 @@ if ($method === "PUT") {
     $stmt = $pdo->prepare("UPDATE leads SET title=?, customer=?, contact_name=?, contact_email=?, contact_phone=?, description=?, created_at = COALESCE(NULLIF(?, ''), created_at) WHERE id=?");
     $stmt->execute([$data["title"], $data["customer"], $contactName, $contactEmail, $contactPhone, $data["description"], $data["created_at"] ?? null, $id]);
 
-    // diagnostic: report how many rows were affected to help debug when updates seem to not persist
+    // Return affected row count to aid debugging
     $affected = $stmt->rowCount();
 
     $pdo->prepare("INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, 'Lead bijgewerkt', ?)")

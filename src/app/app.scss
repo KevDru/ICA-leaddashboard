@@ -28,7 +28,7 @@
 }
 
 .app-content {
-	padding-top: 60px; /* prevent header overlap */
+	padding-top: 60px; /* Keep content clear of fixed header */
 }
 
 
@@ -42,7 +42,7 @@
 
 .name {
 	font-weight: 600;
-	color: #111827; /* gray-900 */
+	color: #111827; /* Deep gray text */
 }
 
 .logout {
@@ -52,10 +52,10 @@
 	border: 1px solid #e5e7eb;
 	border-radius: 999px;
 	background: #ffffff;
-	color: #374151; /* gray-700 */
+	color: #374151; /* Medium gray text */
 	cursor: pointer;
 }
 
 .logout:hover {
-	background: #f3f4f6; /* gray-100 */
+	background: #f3f4f6; /* Light hover background */
 }

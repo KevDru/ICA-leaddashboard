@@ -14,7 +14,7 @@
 
     .note-hint {
       font-size: 12px;
-      color: #6b7280; /* gray-500 */
+      color: #6b7280; /* Muted helper text */
       margin-top: -4px;
     }
   }
@@ -22,13 +22,13 @@
   .notes-section {
     .note-item {
       .note-content {
-        white-space: pre-wrap; /* preserve newlines entered in textarea */
+        white-space: pre-wrap; /* Preserve user-entered newlines */
       }
     }
   }
   .note-item.highlight,
   .attachment-item.highlight {
-    background: #fff7ed; /* subtle highlight */
+    background: #fff7ed; /* Soft highlight */
     box-shadow: 0 0 0 3px rgba(253, 230, 138, 0.4);
     transition: box-shadow 200ms ease, background 200ms ease;
   }
@@ -282,7 +282,7 @@
           color: #1976d2;
         }
         &:hover {
-          background: #f1f5f9; /* subtle hover */
+          background: #f1f5f9; /* Gentle hover */
         }
       }
 

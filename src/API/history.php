@@ -2,7 +2,7 @@
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/db.php';
 
-// Require auth for all methods except OPTIONS
+// Only authenticated users may read history
 ensure_authenticated();
 
 if (!isset($_GET["lead_id"])) {

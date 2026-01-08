@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Verify lead exists
+    // Ensure target lead exists before saving attachment
     $check = $pdo->prepare('SELECT id FROM leads WHERE id = ?');
     $check->execute([$lead_id]);
     if (!$check->fetch()) {
@@ -58,13 +58,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Create uploads directory if not exists
+    // Ensure uploads folder exists
     $uploadsDir = __DIR__ . '/../uploads';
     if (!is_dir($uploadsDir)) {
         mkdir($uploadsDir, 0755, true);
     }
 
-    // Generate unique filename
+    // Create unique filename to avoid collisions
     $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
     $filename = uniqid('attach_') . '.' . $ext;
     $filepath = $uploadsDir . '/' . $filename;
@@ -89,13 +89,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $newId = (int)$pdo->lastInsertId();
 
-    // Insert history entry for the attachment (non-fatal on error)
+    // Log attachment in history but do not fail the request on error
     try {
         $action = 'Bijlage toegevoegd:attachment_id=' . $newId;
         $hstmt = $pdo->prepare('INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, ?, ?)');
         $hstmt->execute([$lead_id, $action, $_SESSION['user_id'] ?? null]);
     } catch (Throwable $e) {
-        // ignore history insertion errors
+        // Silently ignore history write issues
     }
 
     echo json_encode([
@@ -130,13 +130,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         exit;
     }
 
-    // Delete file
+    // Remove file from disk
     $filepath = __DIR__ . '/../uploads/' . $attachment['file_path'];
     if (file_exists($filepath)) {
         unlink($filepath);
     }
 
-    // Delete database record
+    // Remove database record for this attachment
     $del = $pdo->prepare('DELETE FROM attachments WHERE id = ?');
     $del->execute([$id]);
 

@@ -4,7 +4,7 @@
   padding: 1rem;
   border-radius: 0.5rem;
   width: 300px;
-  height: 79vh;
+  min-height: 79vh;
   display: flex;
   flex-direction: column;
   border-top: 6px solid var(--col-color);
@@ -15,8 +15,8 @@
     gap: 0.75rem;
     margin-bottom: 1rem;
     flex-direction: column;
-    justify-content: space-between; /* put actions at top, add button at bottom */
-    min-height: 72px; /* give space for spacing to take effect */
+    justify-content: space-between; /* Keep actions up top and add button below */
+    min-height: 72px; /* Reserve vertical space for header controls */
     
     
 
@@ -24,7 +24,7 @@
       margin: 0;
       flex: 1;
       width: 100%;
-      text-align: center; /* center the column title */
+      text-align: center; /* Center the column title */
       color: #111827;
     }
     .column-actions {
@@ -58,7 +58,7 @@
         }
       }
 
-      /* push delete button slightly away from the arrows */
+      /* Offset delete button from the move controls */
       .delete-column-btn {
         padding: 0.25rem 0.5rem;
         border: none;
@@ -74,7 +74,7 @@
       }
     }
 
-    /* Add-lead button: match the header logout button style (pill, bordered, neutral) */
+    /* Add-lead button styled like the header pill */
     .add-lead-btn {
       margin-top: 0.25rem;
       padding: 6px 10px;
@@ -83,11 +83,11 @@
       border: 1px solid #e5e7eb;
       border-radius: 999px;
       background: #ffffff;
-      color: #374151; /* gray-700 */
+      color: #374151; /* Medium gray text */
       cursor: pointer;
 
       &:hover {
-        background: #f3f4f6; /* gray-100 */
+        background: #f3f4f6; /* Light hover background */
       }
     }
   }

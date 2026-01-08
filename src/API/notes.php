@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Verify lead exists
+    // Ensure the target lead exists before adding a note
     $check = $pdo->prepare('SELECT id FROM leads WHERE id = ?');
     $check->execute([$lead_id]);
     if (!$check->fetch()) {
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ]);
 
     $newId = (int)$pdo->lastInsertId();
-    // Fetch author name if available
+    // Look up the author's display name when available
     $authorName = null;
     if (!empty($_SESSION['user_id'])) {
         $u = $pdo->prepare('SELECT name FROM users WHERE id = ? LIMIT 1');
@@ -69,13 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $row = $u->fetch(PDO::FETCH_ASSOC);
         if ($row && isset($row['name'])) $authorName = $row['name'];
     }
-    // Add history entry for the new note (attempt before responding so frontend refresh sees it)
+    // Write history before responding so the UI refresh includes it
     try {
         $action = 'Notitie toegevoegd:note_id=' . $newId;
         $hstmt = $pdo->prepare('INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, ?, ?)');
         $hstmt->execute([$lead_id, $action, $_SESSION['user_id'] ?? null]);
     } catch (Throwable $e) {
-        // ignore history insertion errors
+        // History write failures are non-fatal
     }
 
     echo json_encode([

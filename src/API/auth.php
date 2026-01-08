@@ -1,15 +1,12 @@
 <?php
-// Common auth + CORS helpers
-
-// Sessions
 if (session_status() === PHP_SESSION_NONE) {
-    // Allow cross-site cookies for the SPA domain (requires HTTPS)
+    // Allow the SPA to send cookies cross-site (requires HTTPS)
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
-        'secure' => true,      // send only over HTTPS
+        'secure' => true,
         'httponly' => true,
-        'samesite' => 'None'   // allow cross-site requests
+        'samesite' => 'None'
     ]);
     session_start();
 }
@@ -38,7 +35,7 @@ function send_cors_headers() {
         header("Vary: Origin");
         header("Access-Control-Allow-Credentials: true");
     } else {
-        // Fallback (no credentials will be allowed by browsers)
+        // Fallback that permits reads but blocks credentialed requests
         header("Access-Control-Allow-Origin: *");
     }
     header("Access-Control-Allow-Headers: Content-Type, Authorization");
@@ -54,7 +51,6 @@ function ensure_authenticated() {
     }
 }
 
-// Handle preflight early
 send_cors_headers();
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);

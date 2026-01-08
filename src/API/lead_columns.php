@@ -2,31 +2,21 @@
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/db.php';
 
-// Enable error reporting in dev
+// Surface errors during development
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// ----------------------
-// Determine HTTP method
-// ----------------------
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Require auth for all methods except OPTIONS
 ensure_authenticated();
 
-// ----------------------
-// GET: fetch all columns
-// ----------------------
 if ($method === "GET") {
     $stmt = $pdo->query("SELECT * FROM lead_columns ORDER BY position ASC");
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
     exit;
 }
 
-// ----------------------
-// POST: create new column
-// ----------------------
 if ($method === "POST") {
     $data = json_decode(file_get_contents("php://input"), true);
 
@@ -36,7 +26,7 @@ if ($method === "POST") {
         exit;
     }
 
-    // Default to a neutral gray if no color provided
+    // Default to a neutral gray when no color is supplied
     $colorInput = $data["color"] ?? null;
     $color = ($colorInput !== null && $colorInput !== '') ? $colorInput : '#d1d5db';
     error_log('lead_columns POST color=' . var_export($colorInput, true));
@@ -84,7 +74,7 @@ if ($method === "DELETE") {
     }
     $id = $_GET["id"];
 
-    // Check if column has leads
+    // Block deletion when leads still reference this column
     $count = $pdo->prepare("SELECT COUNT(*) FROM leads WHERE column_id = ?");
     $count->execute([$id]);
 
@@ -101,8 +91,5 @@ if ($method === "DELETE") {
     exit;
 }
 
-// ----------------------
-// Fallback for unknown methods
-// ----------------------
 http_response_code(405);
 echo json_encode(["error" => "Method not allowed"]);

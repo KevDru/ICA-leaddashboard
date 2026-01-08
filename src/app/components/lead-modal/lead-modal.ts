@@ -45,8 +45,8 @@ export class LeadModalComponent {
     };
 
     this.leadsService.create(payload).subscribe(() => {
-      this.created.emit();           // notify parent to refresh
-      this.dialogRef.close(true);    // close modal
+      this.created.emit();           // Notify parent to refresh
+      this.dialogRef.close(true);    // Close the dialog
     });
   }
 
@@ -55,13 +55,13 @@ export class LeadModalComponent {
   }
 
   private defaultCreatedAt(): string {
-    // Match datetime-local input format (YYYY-MM-DDTHH:mm)
+    // Format for datetime-local input (YYYY-MM-DDTHH:mm)
     return new Date().toISOString().slice(0, 16);
   }
 
   private toSqlDateTime(value: unknown): string | undefined {
     if (!value || typeof value !== 'string') return undefined;
-    // Convert from datetime-local (YYYY-MM-DDTHH:mm) to SQL friendly (YYYY-MM-DD HH:mm:00)
+    // Convert datetime-local value to SQL style (YYYY-MM-DD HH:mm:00)
     const datePart = value.replace('T', ' ');
     return `${datePart}:00`;
   }

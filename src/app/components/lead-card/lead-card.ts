@@ -40,7 +40,7 @@ export class LeadCardComponent {
     });
 
     dialogRef.afterClosed().subscribe(updated => {
-      if (updated) this.refreshLeadEvent.emit(); // notify parent to refresh list
+      if (updated) this.refreshLeadEvent.emit(); // Trigger parent refresh when details change
     });
   }
 
@@ -48,7 +48,7 @@ export class LeadCardComponent {
     if (!confirm('Weet je zeker dat je deze lead wilt verwijderen?')) return;
     
     this.leadsService.delete(this.lead.id).subscribe(() => {
-      this.refreshLeadEvent.emit(); // notify parent to refresh list
+      this.refreshLeadEvent.emit(); // Trigger parent refresh after delete
     });
   }
 }
