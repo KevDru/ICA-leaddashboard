@@ -1,4 +1,16 @@
 <div class="kanban-board">
+  @if (columnLegend().length) {
+    <div class="legend-row">
+      @for (item of columnLegend(); track item.id) {
+        <div class="legend-chip" [style.--col]="item.color" (click)="scrollToColumn(item.id)">
+          <span class="swatch" [style.background]="item.color"></span>
+          <span class="legend-name">{{ item.name }}</span>
+          <span class="legend-count">{{ item.count }}</span>
+        </div>
+      }
+    </div>
+  }
+
   <div class="columns-wrapper">
     <div class="columns">
       @for (column of columns(); track column.id) {

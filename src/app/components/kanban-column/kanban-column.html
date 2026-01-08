@@ -1,4 +1,4 @@
-<div class="kanban-column" [style.--col-color]="column.color || '#d1d5db'">
+<div class="kanban-column" [style.--col-color]="column.color || '#d1d5db'" [attr.id]="'column-' + column.id">
   <div class="column-header">
     <div class="column-actions">
       <div class="move-buttons">

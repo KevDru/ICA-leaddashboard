@@ -29,6 +29,23 @@ export class KanbanBoardComponent implements OnInit {
   leadsMap = signal<Map<number, Lead[]>>(new Map());
   connectedDropLists = signal<string[]>([]);
 
+  columnLegend() {
+    return this.columns().map(col => ({
+      id: col.id,
+      name: col.name,
+      color: col.color || '#d1d5db',
+      count: (this.leadsMap().get(col.id) ?? []).length,
+    }));
+  }
+
+  scrollToColumn(columnId: number) {
+    const el = document.getElementById(`column-${columnId}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
+    el.classList.add('pulse-highlight');
+    setTimeout(() => el.classList.remove('pulse-highlight'), 1400);
+  }
+
   private columnsService = inject(ColumnsService);
   private leadsService = inject(LeadsService);
   private dialog = inject(MatDialog);
