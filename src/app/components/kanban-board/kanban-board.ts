@@ -43,7 +43,7 @@ export class KanbanBoardComponent implements OnInit {
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
     el.classList.add('pulse-highlight');
-    setTimeout(() => el.classList.remove('pulse-highlight'), 1400);
+    setTimeout(() => el.classList.remove('pulse-highlight'), 2000);
   }
 
   private columnsService = inject(ColumnsService);

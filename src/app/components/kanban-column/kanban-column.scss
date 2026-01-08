@@ -9,6 +9,15 @@
   flex-direction: column;
   border-top: 6px solid var(--col-color);
 
+  &.pulse-highlight {
+    animation: columnPulse 6s ease alternate 2;
+  }
+
+  @keyframes columnPulse {
+    from { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4); }
+    to { box-shadow: 0 0 0 8px rgba(234, 179, 8, 0); }
+  }
+
   .column-header {
     display: flex;
     align-items: stretch;
