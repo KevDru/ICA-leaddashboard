@@ -6,6 +6,7 @@ import { LeadCardComponent } from '../lead-card/lead-card';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { MatDialog } from '@angular/material/dialog';
 import { LeadModalComponent } from '../lead-modal/lead-modal';
+import { ColumnModalComponent } from '../column-modal/column-modal';
 import { ColumnsService } from '../../services/columns.services';
 
 @Component({
@@ -64,6 +65,22 @@ export class KanbanColumnComponent implements OnChanges {
     this.columnsService.delete(this.column.id).subscribe({
       next: () => this.reloadEvent.emit(),
       error: (err) => alert(err.error?.error || 'Failed to delete column')
+    });
+  }
+
+  editColumn() {
+    const dialogRef = this.dialog.open(ColumnModalComponent, {
+      width: '450px',
+      data: { isEdit: true, column: this.column }
+    });
+
+    dialogRef.afterClosed().subscribe((columnData: { name: string; color?: string } | null) => {
+      if (columnData) {
+        this.columnsService.update(this.column.id, { name: columnData.name, color: columnData.color, position: this.column.position }).subscribe({
+          next: () => this.reloadEvent.emit(),
+          error: (err) => alert(err.error?.error || 'Failed to update column')
+        });
+      }
     });
   }
 }

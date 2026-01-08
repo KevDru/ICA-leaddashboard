@@ -25,6 +25,13 @@
         border-color: #393c42;
       }
     }
+
+    input[type="color"] {
+      padding: 0;
+      height: 42px;
+      width: 100%;
+      cursor: pointer;
+    }
   }
 
   .buttons {

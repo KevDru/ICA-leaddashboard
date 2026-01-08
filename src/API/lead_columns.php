@@ -36,16 +36,21 @@ if ($method === "POST") {
         exit;
     }
 
+    // Default to a neutral gray if no color provided
+    $colorInput = $data["color"] ?? null;
+    $color = ($colorInput !== null && $colorInput !== '') ? $colorInput : '#d1d5db';
+    error_log('lead_columns POST color=' . var_export($colorInput, true));
+
     $posStmt = $pdo->query("SELECT COALESCE(MAX(position), 0) + 1 AS next_pos FROM lead_columns");
     $nextPos = $posStmt->fetchColumn();
 
     $stmt = $pdo->prepare("
-    INSERT INTO lead_columns (name, position)
-    VALUES (?, ?)
+    INSERT INTO lead_columns (name, position, color)
+    VALUES (?, ?, ?)
 ");
-    $stmt->execute([$data["name"], $nextPos]);
+    $stmt->execute([$data["name"], $nextPos, $color]);
 
-    echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
+    echo json_encode(["success" => true, "id" => $pdo->lastInsertId(), "color" => $color]);
     exit;
 }
 
@@ -59,16 +64,18 @@ if ($method === "PUT") {
     $id = $_GET["id"];
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $stmt = $pdo->prepare("UPDATE lead_columns SET name = ?, position = ? WHERE id = ?");
-    $stmt->execute([$data["name"], $data["position"], $id]);
+    $colorInput = $data["color"] ?? null;
+    $color = ($colorInput !== null && $colorInput !== '') ? $colorInput : null;
+    error_log('lead_columns PUT color=' . var_export($colorInput, true));
 
-    echo json_encode(["success" => true]);
+    $stmt = $pdo->prepare("UPDATE lead_columns SET name = ?, position = ?, color = COALESCE(?, color) WHERE id = ?");
+    $stmt->execute([$data["name"], $data["position"], $color, $id]);
+
+    echo json_encode(["success" => true, "color" => $color ?? 'unchanged']);
     exit;
 }
 
-// ----------------------
-// DELETE: delete column
-// ----------------------
+
 if ($method === "DELETE") {
     if (!isset($_GET["id"])) {
         http_response_code(400);

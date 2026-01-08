@@ -111,7 +111,7 @@ export class KanbanBoardComponent implements OnInit {
     this.connectedDropLists.set(withPositions.map(col => `drop-list-${col.id}`));
 
     const requests = withPositions.map(col =>
-      this.columnsService.update(col.id, { name: col.name, position: col.position })
+      this.columnsService.update(col.id, { name: col.name, position: col.position, color: col.color })
     );
 
     forkJoin(requests).subscribe({
@@ -132,9 +132,9 @@ export class KanbanBoardComponent implements OnInit {
       width: '450px'
     });
 
-    dialogRef.afterClosed().subscribe((columnName: string | null) => {
-      if (columnName) {
-        this.columnsService.create(columnName).subscribe(() => {
+    dialogRef.afterClosed().subscribe((columnData: { name: string; color?: string } | null) => {
+      if (columnData) {
+        this.columnsService.create(columnData).subscribe(() => {
           this.loadColumns();
         });
       }
