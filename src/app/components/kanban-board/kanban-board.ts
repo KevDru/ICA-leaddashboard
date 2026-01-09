@@ -41,7 +41,7 @@ export class KanbanBoardComponent implements OnInit {
   scrollToColumn(columnId: number) {
     const el = document.getElementById(`column-${columnId}`);
     if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     el.classList.add('pulse-highlight');
     setTimeout(() => el.classList.remove('pulse-highlight'), 2000);
   }
