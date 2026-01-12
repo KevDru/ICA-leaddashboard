@@ -39,10 +39,10 @@
             }
           }
         </select>
+        <input type="number" [(ngModel)]="selectedTagPercentage" placeholder="%" min="0" max="100" class="percentage-input" />
         <button type="button" (click)="assignTag()" [disabled]="!selectedTagId">Tag toevoegen</button>
         <button type="button" (click)="createAndAssignTag()" class="create-btn">+ Nieuwe tag</button>
       </div>
-
       <div class="assigned-tags">
         <h4>Toegewezen tags:</h4>
         @if (assignedTags().length > 0) {
@@ -50,6 +50,9 @@
             @for (tag of assignedTags(); track tag.id) {
               <span class="tag" [style.background-color]="tag.color || '#6366f1'">
                 {{ tag.name }}
+                @if (tag.percentage) {
+                  <span class="percentage">{{ tag.percentage }}%</span>
+                }
                 <button type="button" class="remove-tag" (click)="removeTag(tag.id)">×</button>
               </span>
             }

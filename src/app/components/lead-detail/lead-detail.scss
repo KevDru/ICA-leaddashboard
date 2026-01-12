@@ -211,7 +211,8 @@
 
       select,
       input[type="text"],
-      input[type="color"] {
+      input[type="color"],
+      input[type="number"] {
         padding: 0.5rem;
         border: 1px solid #ccc;
         border-radius: 4px;
@@ -229,6 +230,10 @@
         width: 50px;
         cursor: pointer;
         padding: 2px;
+      }
+
+      .percentage-input {
+        width: 80px;
       }
 
       button {
@@ -284,6 +289,11 @@
           font-size: 14px;
           font-weight: 500;
           white-space: nowrap;
+
+          .percentage {
+            font-size: 12px;
+            opacity: 0.9;
+          }
 
           .remove-tag {
             background: none;

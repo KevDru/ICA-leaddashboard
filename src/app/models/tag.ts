@@ -12,6 +12,7 @@ export interface LeadTag {
   tag_id: number;
   name: string;
   color?: string;
+  percentage?: number | null;
   tag?: Tag;
   created_at?: string;
 }

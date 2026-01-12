@@ -26,8 +26,8 @@ export class TagsService {
   }
 
   // Assign a tag to a lead
-  assign(leadId: number, tagId: number) {
-    return this.http.post<{ success: boolean; leadTag: LeadTag }>(`${this.api}?action=assign`, { lead_id: leadId, tag_id: tagId }, { ...this.opts, headers: { 'Content-Type': 'application/json' } });
+  assign(leadId: number, tagId: number, percentage?: number) {
+    return this.http.post<{ success: boolean; leadTag: LeadTag }>(`${this.api}?action=assign`, { lead_id: leadId, tag_id: tagId, percentage: percentage || null }, { ...this.opts, headers: { 'Content-Type': 'application/json' } });
   }
 
   // Remove a tag from a lead

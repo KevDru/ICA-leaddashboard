@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $lead_id = (int)$data['lead_id'];
         $tag_id = (int)$data['tag_id'];
+        $percentage = isset($data['percentage']) && $data['percentage'] !== null ? (int)$data['percentage'] : null;
 
         // Verify lead exists
         $check = $pdo->prepare('SELECT id FROM leads WHERE id = ?');
@@ -70,9 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Assign tag
         $stmt = $pdo->prepare("
-            INSERT INTO lead_tags (lead_id, tag_id) VALUES (?, ?)
+            INSERT INTO lead_tags (lead_id, tag_id, percentage) VALUES (?, ?, ?)
         ");
-        $stmt->execute([$lead_id, $tag_id]);
+        $stmt->execute([$lead_id, $tag_id, $percentage]);
 
         // Get the tag details
         $stmt = $pdo->prepare('SELECT * FROM tags WHERE id = ?');
@@ -82,13 +83,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Log to history
         try {
             $action = 'Tag toegevoegd: ' . $tag['name'];
+            if ($percentage !== null) {
+                $action .= ' (' . $percentage . '%)';
+            }
             $hstmt = $pdo->prepare('INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, ?, ?)');
             $hstmt->execute([$lead_id, $action, $_SESSION['user_id'] ?? null]);
         } catch (Throwable $e) {
             // History write failures are non-fatal
         }
 
-        echo json_encode(['success' => true, 'leadTag' => ['lead_id' => $lead_id, 'tag_id' => $tag_id, 'tag' => $tag]]);
+        echo json_encode(['success' => true, 'leadTag' => ['lead_id' => $lead_id, 'tag_id' => $tag_id, 'percentage' => $percentage, 'tag' => $tag]]);
         exit;
     }
 

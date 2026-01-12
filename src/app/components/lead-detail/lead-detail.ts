@@ -11,7 +11,7 @@ import { Lead } from '../../models/lead';
 import { LeadHistory } from '../../models/history';
 import { Attachment } from '../../models/attachment';
 import { Note } from '../../models/note';
-import { Tag } from '../../models/tag';
+import { Tag, LeadTag } from '../../models/tag';
 import { TagModalComponent } from '../tag-modal/tag-modal';
 import { AppData } from '../../../app-data';
 
@@ -28,8 +28,9 @@ export class LeadDetailComponent implements OnInit {
   attachments = signal<Attachment[]>([]);
   notes = signal<Note[]>([]);
   availableTags = signal<Tag[]>([]);
-  assignedTags = signal<Tag[]>([]);
+  assignedTags = signal<LeadTag[]>([]);
   selectedTagId: string = '';
+  selectedTagPercentage: number | null = null;
   form!: FormGroup;
   noteForm = new FormGroup({
     content: new FormControl('', [Validators.required, Validators.minLength(1)])
@@ -304,13 +305,8 @@ export class LeadDetailComponent implements OnInit {
 
   loadAssignedTags(leadId: number) {
     this.tagsService.getByLead(leadId).subscribe(leadTags => {
-      // The API returns flat objects with tag properties (id, name, color)
-      const tags: Tag[] = leadTags.map(lt => ({
-        id: lt.id,
-        name: lt.name,
-        color: lt.color
-      }));
-      this.assignedTags.set(tags);
+      // Keep the full LeadTag objects to preserve percentage data
+      this.assignedTags.set(leadTags);
     });
   }
 
@@ -322,9 +318,10 @@ export class LeadDetailComponent implements OnInit {
     if (!this.selectedTagId || !this.lead()) return;
     
     const tagId = Number(this.selectedTagId);
-    this.tagsService.assign(this.lead()!.id, tagId).subscribe({
+    this.tagsService.assign(this.lead()!.id, tagId, this.selectedTagPercentage || undefined).subscribe({
       next: () => {
         this.selectedTagId = '';
+        this.selectedTagPercentage = null;
         this.loadAssignedTags(this.lead()!.id);
         this.loadAvailableTags();
       },
