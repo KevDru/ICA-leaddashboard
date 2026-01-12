@@ -45,3 +45,5 @@ Thumbs.db
 vendor/
 
 db.php
+
+vendor/
