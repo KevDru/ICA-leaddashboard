@@ -20,24 +20,6 @@
     <button type="submit" [disabled]="!form.valid">Opslaan</button>
     <button type="button" class="delete-btn" (click)="delete()">Lead verwijderen</button>
   </form>
-
-  <h3>Labels</h3>
-  <div class="tags-picker">
-    @if (tags().length) {
-      @for (tag of tags(); track tag.id) {
-        <div class="tag-chip"
-             [class.selected]="isTagSelected(tag.id)"
-             [style.borderColor]="tag.color"
-             [style.background]="isTagSelected(tag.id) ? tag.color : '#f9fafb'"
-             (click)="toggleTag(tag.id)">
-          <span class="swatch" [style.background]="tag.color"></span>
-          <span>{{ tag.name }}</span>
-        </div>
-      }
-    } @else {
-      <p class="muted">Nog geen labels aangemaakt.</p>
-    }
-  </div>
   
 
   <h3 (click)="toggleNotes()" class="collapsible-header">

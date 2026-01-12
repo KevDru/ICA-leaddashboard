@@ -1,7 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { ColumnsService } from '../../services/columns.services';
 import { LeadsService } from '../../services/leads.services';
-import { TagsService } from '../../services/tags.service';
 import { Column } from '../../models/column';
 import { Lead } from '../../models/lead';
 import {
@@ -16,7 +15,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { ColumnModalComponent } from '../column-modal/column-modal';
-import { TagModalComponent } from '../tag-modal/tag-modal';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -50,7 +48,6 @@ export class KanbanBoardComponent implements OnInit {
 
   private columnsService = inject(ColumnsService);
   private leadsService = inject(LeadsService);
-  private tagsService = inject(TagsService);
   private dialog = inject(MatDialog);
 
   ngOnInit(): void {
@@ -156,23 +153,6 @@ export class KanbanBoardComponent implements OnInit {
       if (columnData) {
         this.columnsService.create(columnData).subscribe(() => {
           this.loadColumns();
-        });
-      }
-    });
-  }
-
-  createTagFromLegend() {
-    const dialogRef = this.dialog.open(TagModalComponent, {
-      width: '400px'
-    });
-
-    dialogRef.afterClosed().subscribe((tagData: { name: string; color?: string } | null) => {
-      if (tagData) {
-        this.tagsService.create(tagData).subscribe({
-          next: () => {
-            alert('Label aangemaakt');
-          },
-          error: (err) => alert(err?.error?.error ?? 'Kon label niet aanmaken')
         });
       }
     });

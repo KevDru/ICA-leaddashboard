@@ -16,13 +16,7 @@ if ($method === "GET") {
             WHERE l.id = ?
         ");
         $stmt->execute([$_GET["id"]]);
-        $lead = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($lead) {
-            $tagStmt = $pdo->prepare("SELECT t.id, t.name, t.color FROM tags t INNER JOIN lead_tags lt ON lt.tag_id = t.id WHERE lt.lead_id = ? ORDER BY t.name ASC");
-            $tagStmt->execute([$lead['id']]);
-            $lead['tags'] = $tagStmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-        echo json_encode($lead);
+        echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
         exit;
     }
 
@@ -37,24 +31,7 @@ if ($method === "GET") {
             ORDER BY l.id DESC
         ");
         $stmt->execute([$columnId]);
-                $leads = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                $leadIds = array_column($leads, 'id');
-                $tagsByLead = [];
-                if (!empty($leadIds)) {
-                    $in  = str_repeat('?,', count($leadIds) - 1) . '?';
-                    $tagStmt = $pdo->prepare("SELECT lt.lead_id, t.id, t.name, t.color FROM lead_tags lt INNER JOIN tags t ON t.id = lt.tag_id WHERE lt.lead_id IN ($in)");
-                    $tagStmt->execute($leadIds);
-                    while ($row = $tagStmt->fetch(PDO::FETCH_ASSOC)) {
-                        $lid = $row['lead_id'];
-                        if (!isset($tagsByLead[$lid])) $tagsByLead[$lid] = [];
-                        $tagsByLead[$lid][] = ['id' => (int)$row['id'], 'name' => $row['name'], 'color' => $row['color']];
-                    }
-                }
-                foreach ($leads as &$lead) {
-                        $leadId = $lead['id'];
-                        $lead['tags'] = $tagsByLead[$leadId] ?? [];
-                }
-                echo json_encode($leads);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
     }
 
@@ -89,13 +66,6 @@ if ($method === "POST") {
     ]);
 
     $id = $pdo->lastInsertId();
-
-    if (!empty($data['tag_ids']) && is_array($data['tag_ids'])) {
-        $insertTag = $pdo->prepare("INSERT INTO lead_tags (lead_id, tag_id) VALUES (?, ?)");
-        foreach ($data['tag_ids'] as $tagId) {
-            $insertTag->execute([$id, $tagId]);
-        }
-    }
 
     // Record creation in history
     $pdo->prepare("INSERT INTO lead_history (lead_id, action, user_id) VALUES (?, 'Lead aangemaakt', ?)")
@@ -145,14 +115,6 @@ if ($method === "PUT") {
 
     $stmt = $pdo->prepare("UPDATE leads SET title=?, customer=?, contact_name=?, contact_email=?, contact_phone=?, description=?, created_at = COALESCE(NULLIF(?, ''), created_at) WHERE id=?");
     $stmt->execute([$data["title"], $data["customer"], $contactName, $contactEmail, $contactPhone, $data["description"], $data["created_at"] ?? null, $id]);
-
-    if (isset($data['tag_ids']) && is_array($data['tag_ids'])) {
-        $pdo->prepare('DELETE FROM lead_tags WHERE lead_id = ?')->execute([$id]);
-        $insertTag = $pdo->prepare("INSERT INTO lead_tags (lead_id, tag_id) VALUES (?, ?)");
-        foreach ($data['tag_ids'] as $tagId) {
-            $insertTag->execute([$id, $tagId]);
-        }
-    }
 
     // Return affected row count to aid debugging
     $affected = $stmt->rowCount();

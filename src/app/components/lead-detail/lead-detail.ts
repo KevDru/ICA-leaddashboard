@@ -11,8 +11,6 @@ import { LeadHistory } from '../../models/history';
 import { Attachment } from '../../models/attachment';
 import { Note } from '../../models/note';
 import { AppData } from '../../../app-data';
-import { Tag } from '../../models/tag';
-import { TagsService } from '../../services/tags.service';
 
 @Component({
   selector: 'app-lead-detail',
@@ -35,15 +33,12 @@ export class LeadDetailComponent implements OnInit {
   notesExpanded = signal(false);
   attachmentsExpanded = signal(false);
   historyExpanded = signal(false);
-  tags = signal<Tag[]>([]);
-  selectedTagIds = signal<number[]>([]);
 
   private readonly leadsService = inject(LeadsService);
   private readonly historyService = inject(HistoryService);
   private readonly attachmentService = inject(AttachmentService);
   private readonly notesService = inject(NotesService);
   private readonly appData = inject(AppData);
-  private readonly tagsService = inject(TagsService);
 
   constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: { id?: number } | null,
@@ -52,19 +47,7 @@ export class LeadDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.dialogData?.id;
-    this.loadTags();
     if (id) this.loadLead(id);
-  }
-
-  loadTags() {
-    this.tagsService.getAll().subscribe(tags => {
-      this.tags.set(tags);
-      // Keep selection in sync if lead already loaded
-      if (this.lead()?.tags?.length) {
-        const currentIds = (this.lead()?.tags || []).map(t => t.id);
-        this.selectedTagIds.set(currentIds);
-      }
-    });
   }
 
   toggleNotes() {
@@ -91,8 +74,6 @@ export class LeadDetailComponent implements OnInit {
         description: new FormControl(l.description),
         created_at: new FormControl(this.toDateTimeLocal(l.created_at))
       });
-      const tagIds = (l.tags || []).map(t => t.id);
-      this.selectedTagIds.set(tagIds);
       this.loadHistory(id);
       this.loadAttachments(id);
       this.loadNotes(id);
@@ -209,8 +190,7 @@ export class LeadDetailComponent implements OnInit {
 
     const payload = {
       ...this.form.value,
-      created_at: this.toSqlDateTime(this.form.value.created_at as string | null),
-      tag_ids: this.selectedTagIds()
+      created_at: this.toSqlDateTime(this.form.value.created_at as string | null)
     };
 
     this.leadsService.update(this.lead()!.id, payload)
@@ -222,20 +202,6 @@ export class LeadDetailComponent implements OnInit {
             this.showError(err, 'Failed to save lead');
         }
       });
-  }
-
-  toggleTag(tagId: number) {
-    const current = new Set(this.selectedTagIds());
-    if (current.has(tagId)) {
-      current.delete(tagId);
-    } else {
-      current.add(tagId);
-    }
-    this.selectedTagIds.set(Array.from(current));
-  }
-
-  isTagSelected(tagId: number): boolean {
-    return this.selectedTagIds().includes(tagId);
   }
 
     private showError(err: any, fallback?: string) {
