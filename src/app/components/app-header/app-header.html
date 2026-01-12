@@ -1,0 +1,17 @@
+@if (auth.user(); as u) {
+<header class="app-header">
+  <div class="wrap">
+    <nav class="tabs">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Leads</a>
+      <a routerLink="/stats" routerLinkActive="active">Statistieken</a>
+    </nav>
+
+    <div class="spacer"></div>
+
+    <div class="info">
+      <span class="name">{{ userDisplayName }}</span>
+    </div>
+    <button class="logout" (click)="onLogout()">Afmelden</button>
+  </div>
+</header>
+}

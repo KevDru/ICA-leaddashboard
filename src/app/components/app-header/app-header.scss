@@ -1,0 +1,84 @@
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 4px;
+  align-items: center;
+
+  a {
+    padding: 6px 12px;
+    border-radius: 999px;
+    text-decoration: none;
+    color: #374151;
+    font-weight: 500;
+    transition: background-color 120ms ease, color 120ms ease;
+
+    &.active {
+      background: #111827;
+      color: #ffffff;
+    }
+
+    &:hover:not(.active) {
+      background: #e5e7eb;
+    }
+  }
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #f9fafb;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.logout {
+  margin-left: 4px;
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #374151;
+  cursor: pointer;
+}
+
+.logout:hover {
+  background: #f3f4f6;
+}

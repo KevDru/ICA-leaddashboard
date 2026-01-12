@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
+import { RouterOutlet, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
+import { AppHeaderComponent } from './components/app-header/app-header';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, AppHeaderComponent],
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
 })
@@ -16,29 +17,5 @@ export class AppComponent {
 
   constructor() {
     this.auth.bootstrap();
-  }
-
-  onLogout() {
-    this.auth.logout().subscribe(() => {
-      this.auth.user.set(null);
-      this.router.navigateByUrl('/login');
-    });
-  }
-
-  get userDisplayName(): string {
-    const u = this.auth.user();
-    if (!u) return '';
-    return (u.name && u.name.trim()) ? u.name as string : u.email;
-  }
-
-  get userInitials(): string {
-    const u = this.auth.user();
-    if (!u) return '';
-    const source = (u.name && u.name.trim()) ? (u.name as string) : (u.email.split('@')[0] || u.email);
-    const parts = source.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return source.slice(0, 2).toUpperCase();
   }
 }

@@ -1,16 +1,4 @@
-@if (auth.user(); as u) {
-<header class="app-header">
-  <div class="wrap">
-    <div class="spacer"></div>
-
-      <div class="info">
-        <span class="name">{{ userDisplayName }}</span>
-      </div>
-      <button class="logout" (click)="onLogout()">Afmelden</button>
-    </div>
-
-</header>
-}
+<app-header></app-header>
 <div class="app-content">
   <router-outlet></router-outlet>
 </div>
