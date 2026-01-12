@@ -13,6 +13,8 @@
     <input formControlName="contact_email" />
     <label>Telefoon contact</label>
     <input formControlName="contact_phone" />
+    <label>Waarde (€)</label>
+    <input type="number" formControlName="value" step="0.01" min="0" placeholder="0,00" />
     <label>Beschrijving</label>
     <textarea formControlName="description"></textarea>
     <label>Aangemaakt op</label>
@@ -21,6 +23,43 @@
     <button type="button" class="delete-btn" (click)="delete()">Lead verwijderen</button>
   </form>
   
+
+  <h3 (click)="toggleTags()" class="collapsible-header">
+    <span class="toggle">{{ tagsExpanded() ? '▼' : '▶' }}</span>
+    Tags
+  </h3>
+  @if (tagsExpanded()) {
+    <div class="tags-section">
+      <div class="tag-input">
+        <select [(ngModel)]="selectedTagId">
+          <option value="">-- Selecteer tag --</option>
+          @for (tag of availableTags(); track tag.id) {
+            @if (!isTagAssigned(tag.id)) {
+              <option [value]="tag.id">{{ tag.name }}</option>
+            }
+          }
+        </select>
+        <button type="button" (click)="assignTag()" [disabled]="!selectedTagId">Tag toevoegen</button>
+        <button type="button" (click)="createAndAssignTag()" class="create-btn">+ Nieuwe tag</button>
+      </div>
+
+      <div class="assigned-tags">
+        <h4>Toegewezen tags:</h4>
+        @if (assignedTags().length > 0) {
+          <div class="tags-list">
+            @for (tag of assignedTags(); track tag.id) {
+              <span class="tag" [style.background-color]="tag.color || '#6366f1'">
+                {{ tag.name }}
+                <button type="button" class="remove-tag" (click)="removeTag(tag.id)">×</button>
+              </span>
+            }
+          </div>
+        } @else {
+          <p class="empty">Geen tags toegewezen</p>
+        }
+      </div>
+    </div>
+  }
 
   <h3 (click)="toggleNotes()" class="collapsible-header">
     <span class="toggle">{{ notesExpanded() ? '▼' : '▶' }}</span>

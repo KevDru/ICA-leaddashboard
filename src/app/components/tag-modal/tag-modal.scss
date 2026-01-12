@@ -1,0 +1,92 @@
+.tag-form {
+  padding: 2rem;
+  max-width: 400px;
+
+  h2 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.5rem;
+    color: #333;
+  }
+
+  .field {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #333;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 14px;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: #1976d2;
+        box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+      }
+
+      &[type="color"] {
+        height: 44px;
+        cursor: pointer;
+        padding: 2px;
+      }
+    }
+
+    .error {
+      display: block;
+      margin-top: 0.5rem;
+      color: #d32f2f;
+      font-size: 13px;
+    }
+  }
+
+  .buttons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 150ms ease;
+
+      &.primary {
+        background: #4caf50;
+        color: white;
+
+        &:hover:not(:disabled) {
+          background: #45a049;
+        }
+
+        &:disabled {
+          background: #ccc;
+          cursor: not-allowed;
+        }
+      }
+
+      &.secondary {
+        background: #f5f5f5;
+        color: #333;
+        border: 1px solid #ddd;
+
+        &:hover {
+          background: #efefef;
+        }
+      }
+    }
+  }
+}

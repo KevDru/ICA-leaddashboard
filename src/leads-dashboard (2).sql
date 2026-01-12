@@ -198,6 +198,31 @@ ALTER TABLE `leads`
 ALTER TABLE `lead_columns`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
+-- --------------------------------------------------------
+--
+-- Table structure for table `tags`
+--
+
+CREATE TABLE `tags` (
+  `id` int NOT NULL,
+  `name` varchar(255) NOT NULL UNIQUE,
+  `color` varchar(7) DEFAULT '#6366f1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+--
+-- Table structure for table `lead_tags`
+--
+
+CREATE TABLE `lead_tags` (
+  `id` int NOT NULL,
+  `lead_id` int NOT NULL,
+  `tag_id` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 --
 -- AUTO_INCREMENT for table `lead_history`
 --
@@ -209,6 +234,18 @@ ALTER TABLE `lead_history`
 --
 ALTER TABLE `notes`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tags`
+--
+ALTER TABLE `tags`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `lead_tags`
+--
+ALTER TABLE `lead_tags`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -237,6 +274,18 @@ ALTER TABLE `lead_history`
 --
 ALTER TABLE `notes`
   ADD CONSTRAINT `notes_ibfk_1` FOREIGN KEY (`lead_id`) REFERENCES `leads` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `lead_tags`
+--
+ALTER TABLE `lead_tags`
+  ADD CONSTRAINT `lead_tags_ibfk_1` FOREIGN KEY (`lead_id`) REFERENCES `leads` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `lead_tags_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) ON DELETE CASCADE;
+
+--
+-- Add unique constraint to prevent duplicate tag assignments
+--
+ALTER TABLE `lead_tags` ADD UNIQUE KEY `unique_lead_tag` (`lead_id`, `tag_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

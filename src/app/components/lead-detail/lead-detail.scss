@@ -196,6 +196,120 @@
     }
   }
 
+  .tags-section {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    border: 1px solid #eee;
+    background: #fafafa;
+    border-radius: 4px;
+
+    .tag-input {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+
+      select,
+      input[type="text"],
+      input[type="color"] {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 14px;
+
+        &:focus {
+          outline: none;
+          border-color: #1976d2;
+          box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        }
+      }
+
+      input[type="color"] {
+        width: 50px;
+        cursor: pointer;
+        padding: 2px;
+      }
+
+      button {
+        padding: 0.5rem 1rem;
+        border: none;
+        background: #393c42;
+        color: white;
+        cursor: pointer;
+        border-radius: 4px;
+        font-weight: 500;
+
+        &:hover {
+          opacity: 0.85;
+        }
+
+        &:disabled {
+          background: #ccc;
+          cursor: not-allowed;
+        }
+
+        &.create-btn {
+          background: #393c42;
+          margin-left: auto;
+          border-radius: 100px;
+
+          &:hover {
+           opacity: 0.85;
+          }
+        }
+      }
+    }
+
+    .assigned-tags {
+      h4 {
+        margin: 1rem 0 0.5rem 0;
+        font-size: 14px;
+        color: #333;
+      }
+
+      .tags-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+
+        .tag {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 0.75rem;
+          border-radius: 20px;
+          color: white;
+          font-size: 14px;
+          font-weight: 500;
+          white-space: nowrap;
+
+          .remove-tag {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0;
+            line-height: 1;
+            opacity: 0.8;
+
+            &:hover {
+              opacity: 1;
+            }
+          }
+        }
+      }
+
+      .empty {
+        padding: 0.75rem;
+        color: #999;
+        font-style: italic;
+      }
+    }
+  }
+
   .attachments-section {
     margin: 1.5rem 0;
     padding: 1rem;

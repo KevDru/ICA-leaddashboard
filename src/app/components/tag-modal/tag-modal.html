@@ -1,0 +1,23 @@
+<form [formGroup]="form" (ngSubmit)="createTag()" class="tag-form">
+  <h2>{{ isEdit ? 'Tag bewerken' : 'Nieuwe tag aanmaken' }}</h2>
+  <div class="field">
+    <label for="name">Tagnaam *</label>
+    <input id="name" type="text" formControlName="name" placeholder="Voer tagnaam in" />
+    @if (duplicateNameError) {
+      <span class="error">Deze tagnaam bestaat al</span>
+    }
+  </div>
+
+  <div class="field">
+    <label for="color">Kleur</label>
+    <input id="color" type="color" formControlName="color" />
+    @if (duplicateColorError) {
+      <span class="error">Deze kleur is al in gebruik</span>
+    }
+  </div>
+
+  <div class="buttons">
+    <button type="submit" class="btn primary" [disabled]="!form.valid || duplicateNameError || duplicateColorError">{{ isEdit ? 'Opslaan' : 'Tag aanmaken' }}</button>
+    <button type="button" class="btn secondary" (click)="cancel()">Annuleren</button>
+  </div>
+</form>

@@ -1,12 +1,17 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
-    // Allow the SPA to send cookies cross-site (requires HTTPS)
+    // Detect if we're running over HTTPS
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
+        || ($_SERVER['SERVER_PORT'] ?? 80) == 443
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+    
+    // Allow the SPA to send cookies cross-site (requires HTTPS in production)
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
-        'secure' => true,
+        'secure' => $isHttps,  // Only require secure on HTTPS
         'httponly' => true,
-        'samesite' => 'None'
+        'samesite' => $isHttps ? 'None' : 'Lax'  // None requires secure=true
     ]);
     session_start();
 }

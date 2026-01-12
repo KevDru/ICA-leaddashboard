@@ -4,6 +4,15 @@
   @if (lead.creator_name) {
     <span class="creator">door {{ lead.creator_name }}</span>
   }
+  @if (tags().length > 0) {
+    <div class="tags-container">
+      @for (tag of tags(); track tag.id) {
+        <span class="tag" [style.background-color]="tag.color || '#6366f1'">
+          {{ tag.name }}
+        </span>
+      }
+    </div>
+  }
   <span class="days-since-update">{{ getDaysSinceUpdate() }}d</span>
   <button (click)="deleteLead(); $event.stopPropagation()">×</button>
 </div>

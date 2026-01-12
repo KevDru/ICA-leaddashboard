@@ -1,8 +1,11 @@
 {
   "/api": {
-    "target": "https://leads.imaginecreativeagency.nl",
-    "secure": true,
+    "target": "http://localhost/ICA-leaddashboard/ICA-leaddashboard/src/api",
+    "secure": false,
     "changeOrigin": true,
-    "logLevel": "debug"
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api": ""
+    }
   }
 }

@@ -1,8 +1,10 @@
-import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { LeadDetailComponent } from '../lead-detail/lead-detail';
 import { LeadsService } from '../../services/leads.services';
+import { TagsService } from '../../services/tags.service';
 import { Lead } from '../../models/lead';
+import { Tag } from '../../models/tag';
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
@@ -13,13 +15,31 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
   templateUrl: './lead-card.html',
   styleUrls: ['./lead-card.scss']
 })
-export class LeadCardComponent {
+export class LeadCardComponent implements OnInit {
   @Input() lead!: Lead;
   @Output() deleteLeadEvent = new EventEmitter<number>();
   @Output() refreshLeadEvent = new EventEmitter<void>();
 
+  tags = signal<Tag[]>([]);
+
   private dialog = inject(MatDialog);
   private leadsService = inject(LeadsService);
+  private tagsService = inject(TagsService);
+
+  ngOnInit() {
+    this.loadTags();
+  }
+
+  loadTags() {
+    this.tagsService.getByLead(this.lead.id).subscribe(leadTags => {
+      const tags = leadTags.map(lt => ({
+        id: lt.id,
+        name: lt.name,
+        color: lt.color
+      } as Tag));
+      this.tags.set(tags);
+    });
+  }
 
   getDaysSinceUpdate(): number {
     if (!this.lead.updated_at) return 0;
@@ -40,7 +60,10 @@ export class LeadCardComponent {
     });
 
     dialogRef.afterClosed().subscribe(updated => {
-      if (updated) this.refreshLeadEvent.emit(); // Trigger parent refresh when details change
+      if (updated) {
+        this.loadTags(); // Reload tags when details are updated
+        this.refreshLeadEvent.emit(); // Trigger parent refresh when details change
+      }
     });
   }
 

@@ -48,10 +48,11 @@ if ($method === "POST") {
     $contactName = $data["contact_name"] ?? null;
     $contactEmail = $data["contact_email"] ?? null;
     $contactPhone = $data["contact_phone"] ?? null;
+    $value = isset($data["value"]) && $data["value"] !== '' ? (float)$data["value"] : null;
 
     $stmt = $pdo->prepare("
-           INSERT INTO leads (title, customer, contact_name, contact_email, contact_phone, description, column_id, created_by, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+           INSERT INTO leads (title, customer, contact_name, contact_email, contact_phone, description, value, column_id, created_by, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
     $stmt->execute([
         $data["title"],
@@ -60,6 +61,7 @@ if ($method === "POST") {
            $contactEmail,
            $contactPhone,
         $data["description"] ?? null,
+        $value,
         $data["column_id"],
         $_SESSION['user_id'] ?? null,
         $createdAt
@@ -112,9 +114,10 @@ if ($method === "PUT") {
     $contactName = isset($data["contact_name"]) ? $data["contact_name"] : null;
     $contactEmail = isset($data["contact_email"]) ? $data["contact_email"] : null;
     $contactPhone = isset($data["contact_phone"]) ? $data["contact_phone"] : null;
+    $value = isset($data["value"]) && $data["value"] !== '' ? (float)$data["value"] : null;
 
-    $stmt = $pdo->prepare("UPDATE leads SET title=?, customer=?, contact_name=?, contact_email=?, contact_phone=?, description=?, created_at = COALESCE(NULLIF(?, ''), created_at) WHERE id=?");
-    $stmt->execute([$data["title"], $data["customer"], $contactName, $contactEmail, $contactPhone, $data["description"], $data["created_at"] ?? null, $id]);
+    $stmt = $pdo->prepare("UPDATE leads SET title=?, customer=?, contact_name=?, contact_email=?, contact_phone=?, description=?, value=?, created_at = COALESCE(NULLIF(?, ''), created_at) WHERE id=?");
+    $stmt->execute([$data["title"], $data["customer"], $contactName, $contactEmail, $contactPhone, $data["description"], $value, $data["created_at"] ?? null, $id]);
 
     // Return affected row count to aid debugging
     $affected = $stmt->rowCount();

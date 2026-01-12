@@ -1,15 +1,18 @@
 import { Component, OnInit, signal, inject, Optional, Inject } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { LeadsService } from '../../services/leads.services';
 import { HistoryService } from '../../services/history.services';
 import { AttachmentService } from '../../services/attachments.service';
 import { NotesService } from '../../services/notes.service';
+import { TagsService } from '../../services/tags.service';
 import { Lead } from '../../models/lead';
 import { LeadHistory } from '../../models/history';
 import { Attachment } from '../../models/attachment';
 import { Note } from '../../models/note';
+import { Tag } from '../../models/tag';
+import { TagModalComponent } from '../tag-modal/tag-modal';
 import { AppData } from '../../../app-data';
 
 @Component({
@@ -24,6 +27,9 @@ export class LeadDetailComponent implements OnInit {
   history = signal<LeadHistory[]>([]);
   attachments = signal<Attachment[]>([]);
   notes = signal<Note[]>([]);
+  availableTags = signal<Tag[]>([]);
+  assignedTags = signal<Tag[]>([]);
+  selectedTagId: string = '';
   form!: FormGroup;
   noteForm = new FormGroup({
     content: new FormControl('', [Validators.required, Validators.minLength(1)])
@@ -33,12 +39,15 @@ export class LeadDetailComponent implements OnInit {
   notesExpanded = signal(false);
   attachmentsExpanded = signal(false);
   historyExpanded = signal(false);
+  tagsExpanded = signal(false);
 
   private readonly leadsService = inject(LeadsService);
   private readonly historyService = inject(HistoryService);
   private readonly attachmentService = inject(AttachmentService);
   private readonly notesService = inject(NotesService);
+  private readonly tagsService = inject(TagsService);
   private readonly appData = inject(AppData);
+  private readonly dialog = inject(MatDialog);
 
   constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) public dialogData: { id?: number } | null,
@@ -47,7 +56,10 @@ export class LeadDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.dialogData?.id;
-    if (id) this.loadLead(id);
+    if (id) {
+      this.loadLead(id);
+      this.loadAvailableTags();
+    }
   }
 
   toggleNotes() {
@@ -62,6 +74,10 @@ export class LeadDetailComponent implements OnInit {
     this.historyExpanded.set(!this.historyExpanded());
   }
 
+  toggleTags() {
+    this.tagsExpanded.set(!this.tagsExpanded());
+  }
+
   loadLead(id: number) {
     this.leadsService.getById(id).subscribe((l: Lead) => {
       this.lead.set(l);
@@ -72,11 +88,13 @@ export class LeadDetailComponent implements OnInit {
         contact_email: new FormControl((l as any).contact_email ?? '', [Validators.email]),
         contact_phone: new FormControl((l as any).contact_phone ?? ''),
         description: new FormControl(l.description),
+        value: new FormControl(l.value ?? ''),
         created_at: new FormControl(this.toDateTimeLocal(l.created_at))
       });
       this.loadHistory(id);
       this.loadAttachments(id);
       this.loadNotes(id);
+      this.loadAssignedTags(id);
     });
   }
 
@@ -275,6 +293,77 @@ export class LeadDetailComponent implements OnInit {
   private toSqlDateTime(value: string | null): string | undefined {
     if (!value) return undefined;
     return `${value.replace('T', ' ')}:00`;
+  }
+
+  // Tags methods
+  loadAvailableTags() {
+    this.tagsService.getAll().subscribe(tags => {
+      this.availableTags.set(tags);
+    });
+  }
+
+  loadAssignedTags(leadId: number) {
+    this.tagsService.getByLead(leadId).subscribe(leadTags => {
+      // The API returns flat objects with tag properties (id, name, color)
+      const tags: Tag[] = leadTags.map(lt => ({
+        id: lt.id,
+        name: lt.name,
+        color: lt.color
+      }));
+      this.assignedTags.set(tags);
+    });
+  }
+
+  isTagAssigned(tagId: number): boolean {
+    return this.assignedTags().some(t => t.id === tagId);
+  }
+
+  assignTag() {
+    if (!this.selectedTagId || !this.lead()) return;
+    
+    const tagId = Number(this.selectedTagId);
+    this.tagsService.assign(this.lead()!.id, tagId).subscribe({
+      next: () => {
+        this.selectedTagId = '';
+        this.loadAssignedTags(this.lead()!.id);
+        this.loadAvailableTags();
+      },
+      error: (err) => {
+        console.error('Failed to assign tag:', err);
+      }
+    });
+  }
+
+  removeTag(tagId: number) {
+    if (!this.lead()) return;
+
+    this.tagsService.unassign(this.lead()!.id, tagId).subscribe(() => {
+      this.loadAssignedTags(this.lead()!.id);
+      this.loadAvailableTags();
+    });
+  }
+
+  createAndAssignTag() {
+    if (!this.lead()) return;
+
+    const dialogRef = this.dialog.open(TagModalComponent, {
+      width: '500px',
+      data: { isEdit: false, existingTags: this.availableTags() }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) return;
+
+      const { name, color } = result;
+      this.tagsService.create(name, color).subscribe(response => {
+        const newTag = response.tag;
+        // Update local lists and preselect the new tag so user can assign immediately
+        const updated = [...this.availableTags().filter(t => t.id !== newTag.id), newTag]
+          .sort((a, b) => a.name.localeCompare(b.name));
+        this.availableTags.set(updated);
+        this.selectedTagId = String(newTag.id);
+      });
+    });
   }
 }
 
