@@ -1,3 +1,5 @@
+import { Tag } from './tag';
+
 export interface Lead {
   id: number;
   title: string;
@@ -12,4 +14,6 @@ export interface Lead {
   contact_name?: string | null;
   contact_email?: string | null;
   contact_phone?: string | null;
+  tags?: Tag[];
+  tag_ids?: number[]; // convenience for updates/creates
 }
