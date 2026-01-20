@@ -6,7 +6,7 @@ import { AppData } from '../../app-data';
 @Injectable({ providedIn: 'root' })
 export class NotesService {
   private appData = inject(AppData);
-  private api = this.appData.getBaseAPIURL() + '/notes';
+  private api = this.appData.getBaseAPIURL() + '/notes.php';
   private http = inject(HttpClient);
   private opts = { withCredentials: true } as const;
 

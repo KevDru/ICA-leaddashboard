@@ -42,12 +42,22 @@ export class LeadCardComponent implements OnInit {
   }
 
   getDaysSinceUpdate(): number {
-    if (!this.lead.updated_at) return 0;
-    const updateDate = new Date(this.lead.updated_at);
-    const today = new Date();
-    const diffMs = today.getTime() - updateDate.getTime();
+    const timestamps: (string | undefined)[] = [
+      this.lead.last_history_at,
+      this.lead.updated_at,
+      this.lead.created_at
+    ];
+
+    const mostRecent = timestamps
+      .filter((ts): ts is string => Boolean(ts))
+      .map(ts => new Date(ts).getTime())
+      .sort((a, b) => b - a)[0];
+
+    if (!mostRecent || Number.isNaN(mostRecent)) return 0;
+
+    const diffMs = Date.now() - mostRecent;
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    return diffDays;
+    return Math.max(0, diffDays);
   }
 
   openDetailModal() {

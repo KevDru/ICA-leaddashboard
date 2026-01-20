@@ -1,4 +1,7 @@
 <?php
+// Start output buffering to prevent any output before headers
+ob_start();
+
 if (session_status() === PHP_SESSION_NONE) {
     // Detect if we're running over HTTPS
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 

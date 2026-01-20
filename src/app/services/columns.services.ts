@@ -6,7 +6,7 @@ import { AppData } from '../../app-data';
 @Injectable({ providedIn: 'root' })
 export class ColumnsService {
   private appData = inject(AppData);
-  private api = this.appData.getBaseAPIURL() + '/lead_columns';
+  private api = this.appData.getBaseAPIURL() + '/lead_columns.php';
   private http = inject(HttpClient);
   private opts = { withCredentials: true } as const;
 

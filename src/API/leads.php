@@ -10,7 +10,10 @@ ensure_authenticated();
 if ($method === "GET") {
     if (isset($_GET["id"])) {
         $stmt = $pdo->prepare("
-            SELECT l.*, u.name as creator_name 
+            SELECT
+                l.*,
+                u.name as creator_name,
+                (SELECT MAX(created_at) FROM lead_history h WHERE h.lead_id = l.id) AS last_history_at
             FROM leads l 
             LEFT JOIN users u ON l.created_by = u.id 
             WHERE l.id = ?
@@ -24,7 +27,10 @@ if ($method === "GET") {
     $columnId = $_GET["cid"] ?? $_GET["column_id"] ?? null;
     if ($columnId !== null) {
         $stmt = $pdo->prepare("
-            SELECT l.*, u.name as creator_name 
+            SELECT
+                l.*,
+                u.name as creator_name,
+                (SELECT MAX(created_at) FROM lead_history h WHERE h.lead_id = l.id) AS last_history_at
             FROM leads l 
             LEFT JOIN users u ON l.created_by = u.id 
             WHERE l.column_id = ? 

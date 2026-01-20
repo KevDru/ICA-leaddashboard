@@ -1,11 +1,11 @@
 {
   "/api": {
-    "target": "http://localhost/ICA-leaddashboard/ICA-leaddashboard/src/api/index.php",
+    "target": "http://localhost",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug",
     "pathRewrite": {
-      "^/api": ""
+      "^/api": "/ICA-leaddashboard/src/api"
     }
   }
 }

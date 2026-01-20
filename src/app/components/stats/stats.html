@@ -1,0 +1,105 @@
+<section class="stats-wrapper">
+	<header class="page-header">
+		<div>
+			<p class="eyebrow">Overzicht</p>
+			<h1>Budget per tag</h1>
+		</div>
+		<button class="ghost" (click)="load()" [disabled]="loading()">Opnieuw laden</button>
+	</header>
+
+	<div class="panel" *ngIf="loading()">Bezig met laden…</div>
+	<div class="panel error" *ngIf="!loading() && error()">{{ error() }}</div>
+
+	<div class="panel" *ngIf="!loading() && !error()">
+		<div class="totals">
+			<div>
+				<p class="label">Totaal budget</p>
+				<p class="value">{{ totalBudget() | currency:'EUR':'symbol':'1.0-0' }}</p>
+			</div>
+			<div>
+				<p class="label">Aantal tags</p>
+				<p class="value">{{ tags().length }}</p>
+			</div>
+			<div>
+				<p class="label">Aantal kolommen</p>
+				<p class="value">{{ columns().length }}</p>
+			</div>
+		</div>
+
+		<div *ngIf="hasData(); else emptyState" class="tag-grid">
+			<article class="tag-card" *ngFor="let tag of tags(); trackBy: trackByTagId">
+				<div class="tag-meta">
+					<span class="swatch" [style.backgroundColor]="tag.color || '#6366f1'"></span>
+					<div>
+						<p class="name">{{ tag.name }}</p>
+						<p class="percent">{{ tag.percentage | number:'1.0-1' }}% van totaal</p>
+					</div>
+				</div>
+				<p class="budget">{{ tag.budget | currency:'EUR':'symbol':'1.0-0' }}</p>
+			</article>
+		</div>
+
+		<hr class="divider" />
+
+		<div class="section-header">
+			<h2>Budget per kolom</h2>
+		</div>
+
+		<div *ngIf="hasColumnData(); else emptyColumns" class="tag-grid">
+			<article class="tag-card" *ngFor="let col of columns(); trackBy: trackByColumnId">
+				<div class="tag-meta">
+					<span class="swatch" [style.backgroundColor]="col.color || '#e5e7eb'"></span>
+					<div>
+						<p class="name">{{ col.name }}</p>
+						<p class="percent">{{ col.percentage | number:'1.0-1' }}% van totaal</p>
+					</div>
+				</div>
+				<p class="budget">{{ col.budget | currency:'EUR':'symbol':'1.0-0' }}</p>
+				<div class="tag-breakdown" *ngIf="col.tags?.length; else noTagsInColumn">
+					<div class="tag-chip" *ngFor="let t of col.tags">
+						<span class="chip-swatch" [style.backgroundColor]="t.color || '#6366f1'"></span>
+						<span class="chip-name">{{ t.name }}</span>
+						<span class="chip-pct">{{ t.percentage | number:'1.0-1' }}%</span>
+					</div>
+				</div>
+				<ng-template #noTagsInColumn>
+					<p class="muted small">Geen tags in deze kolom.</p>
+				</ng-template>
+
+				<table class="leads-table" *ngIf="col.leads?.length">
+					<thead>
+						<tr>
+							<th class="project">Project</th>
+							<th class="value">Waarde</th>
+							<th class="tags">Verdeling (tags)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let l of col.leads">
+							<td class="project">
+								<strong>{{ l.title }}</strong>
+								<div class="muted small" *ngIf="l.customer">{{ l.customer }}</div>
+							</td>
+							<td class="value">{{ l.value | currency:'EUR':'symbol':'1.0-0' }}</td>
+							<td class="tags">
+								<div class="tag-breakdown">
+									<div class="tag-chip" *ngFor="let t of l.tags">
+										<span class="chip-swatch" [style.backgroundColor]="t.color || '#6366f1'"></span>
+										<span class="chip-name">{{ t.name }}</span>
+										<span class="chip-pct">{{ t.percentage | number:'1.0-1' }}%</span>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</article>
+		</div>
+		<ng-template #emptyColumns>
+			<p class="muted">Geen kolom-budgetten gevonden.</p>
+		</ng-template>
+		<ng-template #emptyState>
+			<p class="muted">Geen budgetten gevonden. Voeg waarde en tags toe aan leads om statistieken te zien.</p>
+		</ng-template>
+	</div>
+</section>

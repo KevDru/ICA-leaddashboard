@@ -10,6 +10,8 @@ export interface Lead {
   creator_name?: string;
   created_at?: string;
   updated_at?: string;
+  // Last activity across history entries
+  last_history_at?: string;
   // Optional contact fields — may be absent if backend hasn't been extended yet
   contact_name?: string | null;
   contact_email?: string | null;

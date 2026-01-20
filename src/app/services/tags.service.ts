@@ -6,7 +6,7 @@ import { AppData } from '../../app-data';
 @Injectable({ providedIn: 'root' })
 export class TagsService {
   private appData = inject(AppData);
-  private api = this.appData.getBaseAPIURL() + '/tags';
+  private api = this.appData.getBaseAPIURL() + '/tags.php';
   private http = inject(HttpClient);
   private opts = { withCredentials: true } as const;
 
