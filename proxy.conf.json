@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://localhost/ICA-leaddashboard/ICA-leaddashboard/src/api",
+    "target": "http://localhost/ICA-leaddashboard/ICA-leaddashboard/src/api/index.php",
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug",

@@ -24,7 +24,7 @@ export class AuthService {
     if (this.bootstrapped) return Promise.resolve();
 
     this.bootstrapPromise = new Promise((resolve) => {
-      this.http.get<{ authenticated: boolean; user?: User }>(`${this.base}/me.php`, this.opts)
+      this.http.get<{ authenticated: boolean; user?: User }>(`${this.base}/me`, this.opts)
         .subscribe({
           next: res => {
             this.user.set(res.authenticated ? (res.user ?? null) : null);
@@ -47,10 +47,10 @@ export class AuthService {
   isAuthenticated() { return !!this.user(); }
 
   login(email: string, password: string) {
-    return this.http.post<{ success: boolean; user: User }>(`${this.base}/login.php`, { email, password }, this.opts);
+    return this.http.post<{ success: boolean; user: User }>(`${this.base}/login`, { email, password }, this.opts);
   }
 
   logout() {
-    return this.http.post<{ success: boolean }>(`${this.base}/logout.php`, {}, this.opts);
+    return this.http.post<{ success: boolean }>(`${this.base}/logout`, {}, this.opts);
   }
 }

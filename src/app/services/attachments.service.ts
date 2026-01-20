@@ -6,7 +6,7 @@ import { AppData } from '../../app-data';
 @Injectable({ providedIn: 'root' })
 export class AttachmentService {
   private appData = inject(AppData);
-  private api = this.appData.getBaseAPIURL() + '/attachments.php';
+  private api = this.appData.getBaseAPIURL() + '/attachments';
   private http = inject(HttpClient);
   private opts = { withCredentials: true } as const;
 
