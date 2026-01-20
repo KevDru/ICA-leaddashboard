@@ -9,3 +9,5 @@
     # Rewrite all requests to index.php
     RewriteRule ^(.*)$ index.php [L,QSA]
 </IfModule>
+
+ # don't delete, otherwise proxy will stop working
